@@ -24,51 +24,51 @@ func NewBlacklistHandler(s *service.BlacklistService) *BlacklistHandler {
 func (h *BlacklistHandler) CreateBlacklistUser(c *gin.Context) {
 	var user model.BlacklistUser
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求参数"})
+		utils.Error(c, http.StatusBadRequest, "无效的请求参数")
 		return
 	}
 
 	// 验证手机号格式
 	if !utils.IsPhoneNumber(user.Phone) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "手机号格式错误"})
+		utils.Error(c, http.StatusBadRequest, "手机号格式错误")
 		return
 	}
 
 	// 验证身份证号格式
 	if !utils.IsIDCard(user.IDCard) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "身份证号格式错误"})
+		utils.Error(c, http.StatusBadRequest, "身份证号格式错误")
 		return
 	}
 
 	// 验证邮箱格式
 	if user.Email != "" && !utils.IsEmail(user.Email) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "邮箱格式错误"})
+		utils.Error(c, http.StatusBadRequest, "邮箱格式错误")
 		return
 	}
 
 	if err := h.service.Create(&user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建用户失败"})
+		utils.Error(c, http.StatusInternalServerError, "创建用户失败")
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	utils.Success(c, user)
 }
 
 // GetBlacklistUser 获取黑名单用户详情
 func (h *BlacklistHandler) GetBlacklistUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的用户ID"})
+		utils.Error(c, http.StatusBadRequest, "无效的用户ID")
 		return
 	}
 
 	user, err := h.service.GetByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "用户不存在"})
+		utils.Error(c, http.StatusNotFound, "用户不存在")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.Success(c, user)
 }
 
 // ListBlacklistUsers 获取黑名单用户列表
@@ -96,107 +96,86 @@ func (h *BlacklistHandler) ListBlacklistUsers(c *gin.Context) {
 	// 调用服务层查询
 	users, total, err := h.service.List(query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "获取用户列表失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, http.StatusInternalServerError, "获取用户列表失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"total": total,
-		"items": users,
-		"page":  query.Page,
-		"size":  query.Size,
-	})
+	utils.SuccessWithPagination(c, users, total, query.Page, query.Size)
 }
 
 // UpdateBlacklistUser 更新黑名单用户
 func (h *BlacklistHandler) UpdateBlacklistUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的用户ID"})
+		utils.Error(c, http.StatusBadRequest, "无效的用户ID")
 		return
 	}
 
 	var user model.BlacklistUser
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求参数"})
+		utils.Error(c, http.StatusBadRequest, "无效的请求参数")
 		return
 	}
 
 	user.ID = uint(id)
 	if err := h.service.Update(&user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新用户失败"})
+		utils.Error(c, http.StatusInternalServerError, "更新用户失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.Success(c, user)
 }
 
 // DeleteBlacklistUser 删除黑名单用户
 func (h *BlacklistHandler) DeleteBlacklistUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的用户ID"})
+		utils.Error(c, http.StatusBadRequest, "无效的用户ID")
 		return
 	}
 
 	if err := h.service.Delete(uint(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除用户失败"})
+		utils.Error(c, http.StatusInternalServerError, "删除用户失败")
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	utils.Success(c, nil)
 }
 
 // CheckPhoneExists 检查手机号是否在黑名单中
 func (h *BlacklistHandler) CheckPhoneExists(c *gin.Context) {
 	phone := c.Query("phone")
 	if phone == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "手机号不能为空",
-		})
+		utils.Error(c, http.StatusBadRequest, "手机号不能为空")
 		return
 	}
 
 	// 验证手机号格式
 	if !utils.IsPhoneNumber(phone) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "手机号格式错误",
-		})
+		utils.Error(c, http.StatusBadRequest, "手机号格式错误")
 		return
 	}
 
 	exists, err := h.service.CheckPhoneExists(phone)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "检查失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, http.StatusInternalServerError, "检查失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"exists": exists,
-	})
+	utils.Success(c, gin.H{"exists": exists})
 }
 
 // GetByPhone 根据手机号获取黑名单用户信息
 func (h *BlacklistHandler) GetByPhone(c *gin.Context) {
 	phone := c.Query("phone")
 	if phone == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "手机号不能为空",
-		})
+		utils.Error(c, http.StatusBadRequest, "手机号不能为空")
 		return
 	}
 
 	// 验证手机号格式
 	if !utils.IsPhoneNumber(phone) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "手机号格式错误",
-		})
+		utils.Error(c, http.StatusBadRequest, "手机号格式错误")
 		return
 	}
 
@@ -206,14 +185,11 @@ func (h *BlacklistHandler) GetByPhone(c *gin.Context) {
 		if err == gorm.ErrRecordNotFound {
 			status = http.StatusNotFound
 		}
-		c.JSON(status, gin.H{
-			"error": "获取用户信息失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, status, "获取用户信息失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.Success(c, user)
 }
 
 // CheckExists 检查用户是否在黑名单中
@@ -225,40 +201,36 @@ func (h *BlacklistHandler) CheckExists(c *gin.Context) {
 	}
 
 	if query.Phone == "" && query.IDCard == "" && query.Name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "至少需要提供一个查询条件（手机号/身份证号/姓名）",
-		})
+		utils.Error(c, http.StatusBadRequest, "至少需要提供一个查询条件（手机号/身份证号/姓名）")
 		return
 	}
+
 	// 检查手机号格式
-	if !utils.IsPhoneNumber(query.Phone) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "手机号格式错误",
-		})
+	if query.Phone != "" && !utils.IsPhoneNumber(query.Phone) {
+		utils.Error(c, http.StatusBadRequest, "手机号格式错误")
 		return
 	}
 
 	exists, err := h.service.CheckExists(query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "检查失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, http.StatusInternalServerError, "检查失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"exists": exists,
-	})
+	utils.Success(c, gin.H{"exists": exists})
 }
 
 // GetByIDCard 根据身份证号获取黑名单用户信息
 func (h *BlacklistHandler) GetByIDCard(c *gin.Context) {
 	idCard := c.Query("id_card")
 	if idCard == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "身份证号不能为空",
-		})
+		utils.Error(c, http.StatusBadRequest, "身份证号不能为空")
+		return
+	}
+
+	// 验证身份证号格式
+	if !utils.IsIDCard(idCard) {
+		utils.Error(c, http.StatusBadRequest, "身份证号格式错误")
 		return
 	}
 
@@ -268,36 +240,28 @@ func (h *BlacklistHandler) GetByIDCard(c *gin.Context) {
 		if err == gorm.ErrRecordNotFound {
 			status = http.StatusNotFound
 		}
-		c.JSON(status, gin.H{
-			"error": "获取用户信息失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, status, "获取用户信息失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.Success(c, user)
 }
 
 // GetByName 根据姓名获取黑名单用户信息列表
 func (h *BlacklistHandler) GetByName(c *gin.Context) {
 	name := c.Query("name")
 	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "姓名不能为空",
-		})
+		utils.Error(c, http.StatusBadRequest, "姓名不能为空")
 		return
 	}
 
 	users, err := h.service.GetByName(name)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "获取用户信息失败",
-			"msg":   err.Error(),
-		})
+		utils.Error(c, http.StatusInternalServerError, "获取用户信息失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	utils.Success(c, gin.H{
 		"total": len(users),
 		"items": users,
 	})

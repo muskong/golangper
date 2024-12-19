@@ -1,17 +1,17 @@
 package main
 
 import (
-	"blacklist/config"
-	"blacklist/internal/pkg/database"
 	"context"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"blacklist/config"
+	"blacklist/internal/api"
 	"blacklist/internal/middleware"
+	"blacklist/internal/pkg/database"
 	"blacklist/internal/pkg/redis"
-	"blacklist/internal/router"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,7 +73,7 @@ func main() {
 	app.Use(middleware.Cors())
 
 	// 注册路由
-	router.RegisterRoutes(app, db)
+	api.RegisterRoutes(app, db)
 
 	// 启动服务器
 	if err := app.Run(":" + cfg.Server.Port); err != nil {
