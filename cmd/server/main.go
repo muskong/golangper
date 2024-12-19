@@ -41,9 +41,19 @@ func main() {
 	defer cancel()
 
 	go func() {
-		<-quit
-		log.Println("正在关闭服务...")
+		sig := <-quit
+		switch sig {
+		case syscall.SIGINT:
+			log.Println("接收到SIGINT信号，正在关闭服务...")
+		case syscall.SIGTERM:
+			log.Println("接收到SIGTERM信号，正在关闭服务...")
+		default:
+			log.Printf("接收到%v信号，正在关闭服务...", sig)
+		}
 		cancel()
+		<-ctx.Done()
+		os.Exit(0)
+		log.Println("服务已关闭")
 	}()
 
 	// 初始化Redis连接
@@ -70,6 +80,4 @@ func main() {
 		log.Fatalf("服务器启动失败: %v", err)
 	}
 
-	<-ctx.Done()
-	log.Println("服务已关闭")
 }
