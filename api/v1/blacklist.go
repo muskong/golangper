@@ -6,6 +6,7 @@ import (
 
 	"blacklist/internal/model"
 	"blacklist/internal/service"
+	"blacklist/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -24,6 +25,24 @@ func (h *BlacklistHandler) CreateBlacklistUser(c *gin.Context) {
 	var user model.BlacklistUser
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的请求参数"})
+		return
+	}
+
+	// 验证手机号格式
+	if !utils.IsPhoneNumber(user.Phone) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "手机号格式错误"})
+		return
+	}
+
+	// 验证身份证号格式
+	if !utils.IsIDCard(user.IDCard) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "身份证号格式错误"})
+		return
+	}
+
+	// 验证邮箱格式
+	if user.Email != "" && !utils.IsEmail(user.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "邮箱格式错误"})
 		return
 	}
 
@@ -141,6 +160,14 @@ func (h *BlacklistHandler) CheckPhoneExists(c *gin.Context) {
 		return
 	}
 
+	// 验证手机号格式
+	if !utils.IsPhoneNumber(phone) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "手机号格式错误",
+		})
+		return
+	}
+
 	exists, err := h.service.CheckPhoneExists(phone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -161,6 +188,14 @@ func (h *BlacklistHandler) GetByPhone(c *gin.Context) {
 	if phone == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "手机号不能为空",
+		})
+		return
+	}
+
+	// 验证手机号格式
+	if !utils.IsPhoneNumber(phone) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "手机号格式错误",
 		})
 		return
 	}
@@ -195,8 +230,15 @@ func (h *BlacklistHandler) CheckExists(c *gin.Context) {
 		})
 		return
 	}
+	// 检查手机号格式
+	if !utils.IsPhoneNumber(query.Phone) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "手机号格式错误",
+		})
+		return
+	}
 
-	exists, details, err := h.service.CheckExists(query)
+	exists, err := h.service.CheckExists(query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "检查失败",
@@ -206,8 +248,7 @@ func (h *BlacklistHandler) CheckExists(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"exists":  exists,
-		"details": details,
+		"exists": exists,
 	})
 }
 

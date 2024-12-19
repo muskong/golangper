@@ -87,10 +87,10 @@ type ExistsQuery struct {
 }
 
 // CheckExists 检查用户是否存在
-func (s *BlacklistService) CheckExists(query *ExistsQuery) (bool, map[string]bool, error) {
+func (s *BlacklistService) CheckExists(query *ExistsQuery) (bool, error) {
 	// 参数验证
 	if query.Phone == "" && query.IDCard == "" && query.Name == "" {
-		return false, nil, fmt.Errorf("至少需要提供一个查询条件")
+		return false, fmt.Errorf("至少需要提供一个查询条件")
 	}
 
 	// 转换为 repository 层的查询参数

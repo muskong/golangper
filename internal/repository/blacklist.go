@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"blacklist/internal/model"
@@ -176,50 +177,39 @@ type ExistsQuery struct {
 }
 
 // CheckExists 检查用户是否存在
-func (r *BlacklistRepository) CheckExists(query *ExistsQuery) (bool, map[string]bool, error) {
+func (r *BlacklistRepository) CheckExists(query *ExistsQuery) (bool, error) {
 	var count int64
 	db := r.db.Model(&model.BlacklistUser{})
-	details := make(map[string]bool)
 
 	// 构建查询条件
-	if query.Phone != "" || query.IDCard != "" || query.Name != "" {
-		db = db.Where("phone = ? OR id_card = ? OR name = ?",
-			query.Phone, query.IDCard, query.Name)
+	conditions := make([]string, 0)
+	args := make([]interface{}, 0)
+
+	if query.Phone != "" {
+		conditions = append(conditions, "phone = ?")
+		args = append(args, query.Phone)
+	}
+	if query.IDCard != "" {
+		conditions = append(conditions, "id_card = ?")
+		args = append(args, query.IDCard)
+	}
+	if query.Name != "" {
+		conditions = append(conditions, "name = ?")
+		args = append(args, query.Name)
+	}
+
+	if len(conditions) > 0 {
+		db = db.Where(strings.Join(conditions, " AND "), args...)
 	} else {
-		return false, details, nil
+		return false, nil
 	}
 
 	// 检查总体是否存在
 	if err := db.Count(&count).Error; err != nil {
-		return false, details, err
+		return false, err
 	}
 
-	// 如果存在，则检查具体字段
-	if count > 0 {
-		if query.Phone != "" {
-			var phoneCount int64
-			r.db.Model(&model.BlacklistUser{}).
-				Where("phone = ?", query.Phone).
-				Count(&phoneCount)
-			details["phone"] = phoneCount > 0
-		}
-		if query.IDCard != "" {
-			var idCardCount int64
-			r.db.Model(&model.BlacklistUser{}).
-				Where("id_card = ?", query.IDCard).
-				Count(&idCardCount)
-			details["id_card"] = idCardCount > 0
-		}
-		if query.Name != "" {
-			var nameCount int64
-			r.db.Model(&model.BlacklistUser{}).
-				Where("name = ?", query.Name).
-				Count(&nameCount)
-			details["name"] = nameCount > 0
-		}
-	}
-
-	return count > 0, details, nil
+	return count > 0, nil
 }
 
 // GetByIDCard 根据身份证号获取用户信息
