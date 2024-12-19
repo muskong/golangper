@@ -3,6 +3,7 @@ package service
 import (
 	"blacklist/internal/model"
 	"blacklist/internal/repository"
+	"fmt"
 )
 
 type BlacklistService struct {
@@ -29,6 +30,51 @@ func (s *BlacklistService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *BlacklistService) List(page, pageSize int) ([]model.BlacklistUser, int64, error) {
-	return s.repo.List(page, pageSize)
+type BlacklistUserQuery struct {
+	Name    string
+	Phone   string
+	IDCard  string
+	Email   string
+	Address string
+	Remark  string
+	Page    int
+	Size    int
+}
+
+func (s *BlacklistService) List(query *BlacklistUserQuery) ([]model.BlacklistUser, int64, error) {
+	if query.Page <= 0 {
+		query.Page = 1
+	}
+	if query.Size <= 0 {
+		query.Size = 10
+	}
+
+	repoQuery := &repository.BlacklistUserQuery{
+		Name:    query.Name,
+		Phone:   query.Phone,
+		IDCard:  query.IDCard,
+		Email:   query.Email,
+		Address: query.Address,
+		Remark:  query.Remark,
+		Page:    query.Page,
+		Size:    query.Size,
+	}
+
+	return s.repo.List(repoQuery)
+}
+
+// CheckPhoneExists 检查手机号是否已被列入黑名单
+func (s *BlacklistService) CheckPhoneExists(phone string) (bool, error) {
+	if phone == "" {
+		return false, fmt.Errorf("手机号不能为空")
+	}
+	return s.repo.ExistsByPhone(phone)
+}
+
+// GetByPhone 根据手机号获取黑名单用户信息
+func (s *BlacklistService) GetByPhone(phone string) (*model.BlacklistUser, error) {
+	if phone == "" {
+		return nil, fmt.Errorf("手机号不能为空")
+	}
+	return s.repo.GetByPhone(phone)
 }

@@ -26,6 +26,8 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			blacklist.GET("/:id", blacklistHandler.GetBlacklistUser)
 			blacklist.PUT("/:id", blacklistHandler.UpdateBlacklistUser)
 			blacklist.DELETE("/:id", blacklistHandler.DeleteBlacklistUser)
+			blacklist.GET("/check", blacklistHandler.CheckPhoneExists)
+			blacklist.GET("/phone", blacklistHandler.GetByPhone)
 		}
 	}
 }
