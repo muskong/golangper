@@ -1,0 +1,23 @@
+blacklist/
+├── api/
+│   └── v1/
+├── cmd/
+│   └── server/
+├── config/
+├── docs/
+├── internal/
+│   ├── middleware/
+│   ├── model/
+│   ├── repository/
+│   └── service/
+├── pkg/
+│   ├── jwt/
+│   ├── logger/
+│   └── utils/
+├── scripts/
+├── web/
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+├── go.mod
+└── README.md 
