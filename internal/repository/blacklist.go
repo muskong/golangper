@@ -167,3 +167,94 @@ func (r *BlacklistRepository) GetByPhone(phone string) (*model.BlacklistUser, er
 
 	return &user, nil
 }
+
+// ExistsQuery 存在性检查的查询参数
+type ExistsQuery struct {
+	Phone  string
+	IDCard string
+	Name   string
+}
+
+// CheckExists 检查用户是否存在
+func (r *BlacklistRepository) CheckExists(query *ExistsQuery) (bool, map[string]bool, error) {
+	var count int64
+	db := r.db.Model(&model.BlacklistUser{})
+	details := make(map[string]bool)
+
+	// 构建查询条件
+	if query.Phone != "" || query.IDCard != "" || query.Name != "" {
+		db = db.Where("phone = ? OR id_card = ? OR name = ?",
+			query.Phone, query.IDCard, query.Name)
+	} else {
+		return false, details, nil
+	}
+
+	// 检查总体是否存在
+	if err := db.Count(&count).Error; err != nil {
+		return false, details, err
+	}
+
+	// 如果存在，则检查具体字段
+	if count > 0 {
+		if query.Phone != "" {
+			var phoneCount int64
+			r.db.Model(&model.BlacklistUser{}).
+				Where("phone = ?", query.Phone).
+				Count(&phoneCount)
+			details["phone"] = phoneCount > 0
+		}
+		if query.IDCard != "" {
+			var idCardCount int64
+			r.db.Model(&model.BlacklistUser{}).
+				Where("id_card = ?", query.IDCard).
+				Count(&idCardCount)
+			details["id_card"] = idCardCount > 0
+		}
+		if query.Name != "" {
+			var nameCount int64
+			r.db.Model(&model.BlacklistUser{}).
+				Where("name = ?", query.Name).
+				Count(&nameCount)
+			details["name"] = nameCount > 0
+		}
+	}
+
+	return count > 0, details, nil
+}
+
+// GetByIDCard 根据身份证号获取用户信息
+func (r *BlacklistRepository) GetByIDCard(idCard string) (*model.BlacklistUser, error) {
+	var user model.BlacklistUser
+
+	// 先从Redis缓存中获取
+	cacheKey := fmt.Sprintf("blacklist:user:idcard:%s", idCard)
+	if data, err := redis.RDB.Get(context.Background(), cacheKey).Result(); err == nil {
+		if err := json.Unmarshal([]byte(data), &user); err == nil {
+			return &user, nil
+		}
+	}
+
+	// 从数据库中获取
+	if err := r.db.Where("id_card = ?", idCard).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	// 存入Redis缓存
+	if data, err := json.Marshal(user); err == nil {
+		redis.RDB.Set(context.Background(), cacheKey, data, 24*time.Hour)
+	}
+
+	return &user, nil
+}
+
+// GetByName 根据姓名获取用户信息列表
+func (r *BlacklistRepository) GetByName(name string) ([]model.BlacklistUser, error) {
+	var users []model.BlacklistUser
+
+	// 从数据库中获取
+	if err := r.db.Where("name = ?", name).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}

@@ -78,3 +78,43 @@ func (s *BlacklistService) GetByPhone(phone string) (*model.BlacklistUser, error
 	}
 	return s.repo.GetByPhone(phone)
 }
+
+// ExistsQuery 存在性检查的查询参数
+type ExistsQuery struct {
+	Phone  string
+	IDCard string
+	Name   string
+}
+
+// CheckExists 检查用户是否存在
+func (s *BlacklistService) CheckExists(query *ExistsQuery) (bool, map[string]bool, error) {
+	// 参数验证
+	if query.Phone == "" && query.IDCard == "" && query.Name == "" {
+		return false, nil, fmt.Errorf("至少需要提供一个查询条件")
+	}
+
+	// 转换为 repository 层的查询参数
+	repoQuery := &repository.ExistsQuery{
+		Phone:  query.Phone,
+		IDCard: query.IDCard,
+		Name:   query.Name,
+	}
+
+	return s.repo.CheckExists(repoQuery)
+}
+
+// GetByIDCard 根据身份证号获取用户信息
+func (s *BlacklistService) GetByIDCard(idCard string) (*model.BlacklistUser, error) {
+	if idCard == "" {
+		return nil, fmt.Errorf("身份证号不能为空")
+	}
+	return s.repo.GetByIDCard(idCard)
+}
+
+// GetByName 根据姓名获取用户信息列表
+func (s *BlacklistService) GetByName(name string) ([]model.BlacklistUser, error) {
+	if name == "" {
+		return nil, fmt.Errorf("姓名不能为空")
+	}
+	return s.repo.GetByName(name)
+}

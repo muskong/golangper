@@ -180,3 +180,84 @@ func (h *BlacklistHandler) GetByPhone(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+// CheckExists 检查用户是否在黑名单中
+func (h *BlacklistHandler) CheckExists(c *gin.Context) {
+	query := &service.ExistsQuery{
+		Phone:  c.Query("phone"),
+		IDCard: c.Query("id_card"),
+		Name:   c.Query("name"),
+	}
+
+	if query.Phone == "" && query.IDCard == "" && query.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "至少需要提供一个查询条件（手机号/身份证号/姓名）",
+		})
+		return
+	}
+
+	exists, details, err := h.service.CheckExists(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "检查失败",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"exists":  exists,
+		"details": details,
+	})
+}
+
+// GetByIDCard 根据身份证号获取黑名单用户信息
+func (h *BlacklistHandler) GetByIDCard(c *gin.Context) {
+	idCard := c.Query("id_card")
+	if idCard == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "身份证号不能为空",
+		})
+		return
+	}
+
+	user, err := h.service.GetByIDCard(idCard)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if err == gorm.ErrRecordNotFound {
+			status = http.StatusNotFound
+		}
+		c.JSON(status, gin.H{
+			"error": "获取用户信息失败",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+// GetByName 根据姓名获取黑名单用户信息列表
+func (h *BlacklistHandler) GetByName(c *gin.Context) {
+	name := c.Query("name")
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "姓名不能为空",
+		})
+		return
+	}
+
+	users, err := h.service.GetByName(name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "获取用户信息失败",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"total": len(users),
+		"items": users,
+	})
+}
