@@ -150,3 +150,36 @@ func (s *BlacklistService) GetQueryLogs(ctx context.Context, merchantID uint, pa
 func (s *BlacklistService) GetQueryLogsByPhone(ctx context.Context, phone string, page, pageSize int) ([]model.BlacklistQueryLog, int64, error) {
 	return s.queryLogRepo.FindByPhone(ctx, phone, page, pageSize)
 }
+
+// GetAllQueryLogs 获取所有查询日志(管理后台)
+func (s *BlacklistService) GetAllQueryLogs(ctx context.Context, page, pageSize int) ([]model.BlacklistQueryLog, int64, error) {
+	var logs []model.BlacklistQueryLog
+	var total int64
+
+	offset := (page - 1) * pageSize
+
+	err := s.queryLogRepo.DB().WithContext(ctx).Model(&model.BlacklistQueryLog{}).
+		Count(&total).
+		Preload("Merchant"). // 预加载商户信息
+		Order("query_time DESC").
+		Offset(offset).
+		Limit(pageSize).
+		Find(&logs).Error
+
+	return logs, total, err
+}
+
+// GetMerchantQueryLogs 获取指定商户的查询日志(管理后台)
+func (s *BlacklistService) GetMerchantQueryLogs(ctx context.Context, merchantID uint, page, pageSize int) ([]model.BlacklistQueryLog, int64, error) {
+	logs, total, err := s.queryLogRepo.FindByMerchantID(ctx, merchantID, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 预加载商户信息
+	if err := s.queryLogRepo.DB().Preload("Merchant").Find(&logs).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return logs, total, err
+}

@@ -10,6 +10,7 @@ type BlacklistQueryLogRepository interface {
 	Create(ctx context.Context, log *model.BlacklistQueryLog) error
 	FindByMerchantID(ctx context.Context, merchantID uint, page, pageSize int) ([]model.BlacklistQueryLog, int64, error)
 	FindByPhone(ctx context.Context, phone string, page, pageSize int) ([]model.BlacklistQueryLog, int64, error)
+	DB() *gorm.DB
 }
 
 type blacklistQueryLogRepository struct {
@@ -56,4 +57,8 @@ func (r *blacklistQueryLogRepository) FindByPhone(ctx context.Context, phone str
 		Find(&logs).Error
 
 	return logs, total, err
+}
+
+func (r *blacklistQueryLogRepository) DB() *gorm.DB {
+	return r.db
 }

@@ -240,7 +240,7 @@ func (h *BlacklistHandler) GetByIDCard(c *gin.Context) {
 		if err == gorm.ErrRecordNotFound {
 			status = http.StatusNotFound
 		}
-		utils.Error(c, status, "获取用户信息失败")
+		utils.Error(c, status, "获取��户信息失败")
 		return
 	}
 
@@ -267,18 +267,12 @@ func (h *BlacklistHandler) GetByName(c *gin.Context) {
 	})
 }
 
-// GetQueryLogs 获取黑名单查询日志
-func (h *BlacklistHandler) GetQueryLogs(c *gin.Context) {
-	merchantID := utils.GetCurrentMerchantID(c)
-	if merchantID == 0 {
-		utils.Error(c, http.StatusUnauthorized, "未授权访问")
-		return
-	}
-
+// GetAllQueryLogs 获取所有查询日志(管理后台)
+func (h *BlacklistHandler) GetAllQueryLogs(c *gin.Context) {
 	page := utils.GetPage(c)
 	pageSize := utils.GetPageSize(c)
 
-	logs, total, err := h.service.GetQueryLogs(c.Request.Context(), merchantID, page, pageSize)
+	logs, total, err := h.service.GetAllQueryLogs(c.Request.Context(), page, pageSize)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "获取查询日志失败")
 		return
@@ -292,11 +286,41 @@ func (h *BlacklistHandler) GetQueryLogs(c *gin.Context) {
 	})
 }
 
-// GetQueryLogsByPhone 获取指定手机号的查询日志
-func (h *BlacklistHandler) GetQueryLogsByPhone(c *gin.Context) {
+// GetMerchantQueryLogs 获取指定商户的查询日志(管理后台)
+func (h *BlacklistHandler) GetMerchantQueryLogs(c *gin.Context) {
+	merchantID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		utils.Error(c, http.StatusBadRequest, "无效的商户ID")
+		return
+	}
+
+	page := utils.GetPage(c)
+	pageSize := utils.GetPageSize(c)
+
+	logs, total, err := h.service.GetMerchantQueryLogs(c.Request.Context(), uint(merchantID), page, pageSize)
+	if err != nil {
+		utils.Error(c, http.StatusInternalServerError, "获取查询日志失败")
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":  logs,
+		"total": total,
+		"page":  page,
+		"size":  pageSize,
+	})
+}
+
+// GetPhoneQueryLogs 获取指定手机号的查询日志(管理后台)
+func (h *BlacklistHandler) GetPhoneQueryLogs(c *gin.Context) {
 	phone := c.Query("phone")
 	if phone == "" {
 		utils.Error(c, http.StatusBadRequest, "手机号不能为空")
+		return
+	}
+
+	if !utils.IsPhoneNumber(phone) {
+		utils.Error(c, http.StatusBadRequest, "手机号格式错误")
 		return
 	}
 

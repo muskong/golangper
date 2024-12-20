@@ -39,6 +39,15 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			merchant.POST("/:id/regenerate", merchantHandler.RegenerateAPICredentials)
 			merchant.GET("/login-logs", middleware.AuthMiddleware(), merchantHandler.GetLoginLogs)
 		}
+
+		// 黑名单管理
+		blacklist := adminGroup.Group("/blacklist")
+		{
+			// 查询日志相关接口
+			blacklist.GET("/query-logs", blacklistHandler.GetAllQueryLogs)           // 获取所有查询日志
+			blacklist.GET("/query-logs/merchant/:id", blacklistHandler.GetMerchantQueryLogs) // 获取指定商户的查询日志
+			blacklist.GET("/query-logs/phone", blacklistHandler.GetPhoneQueryLogs)   // 获取指定手机号的查询日志
+		}
 	}
 
 	// API v1
@@ -59,8 +68,6 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			blacklist.PUT("/:id", blacklistHandler.UpdateBlacklistUser)
 			blacklist.GET("/check", blacklistHandler.CheckPhoneExists)
 			blacklist.GET("/exists", blacklistHandler.CheckExists)
-			blacklist.GET("/query-logs", blacklistHandler.GetQueryLogs)           // 获取商户的查询日志
-			blacklist.GET("/query-logs/phone", blacklistHandler.GetQueryLogsByPhone) // 获取指定手机号的查询日志
 		}
 	}
 }
