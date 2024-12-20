@@ -4,14 +4,24 @@ import (
 	"blacklist/internal/model"
 	"blacklist/internal/repository"
 	"fmt"
+	"context"
+	"time"
+	"log"
 )
 
 type BlacklistService struct {
-	repo *repository.BlacklistRepository
+	repo          repository.BlacklistRepository
+	queryLogRepo  repository.BlacklistQueryLogRepository
 }
 
-func NewBlacklistService(repo *repository.BlacklistRepository) *BlacklistService {
-	return &BlacklistService{repo: repo}
+func NewBlacklistService(
+	repo repository.BlacklistRepository,
+	queryLogRepo repository.BlacklistQueryLogRepository,
+) *BlacklistService {
+	return &BlacklistService{
+		repo:         repo,
+		queryLogRepo: queryLogRepo,
+	}
 }
 
 func (s *BlacklistService) Create(user *model.BlacklistUser) error {
@@ -87,20 +97,19 @@ type ExistsQuery struct {
 }
 
 // CheckExists 检查用户是否存在
-func (s *BlacklistService) CheckExists(query *ExistsQuery) (bool, error) {
-	// 参数验证
-	if query.Phone == "" && query.IDCard == "" && query.Name == "" {
-		return false, fmt.Errorf("至少需要提供一个查询条件")
+func (s *BlacklistService) CheckExists(ctx context.Context, phone string, merchantID uint, ip, userAgent string) (bool, error) {
+	exists, err := s.repo.ExistsByPhone(ctx, phone)
+	if err != nil {
+		return false, err
 	}
 
-	// 转换为 repository 层的查询参数
-	repoQuery := &repository.ExistsQuery{
-		Phone:  query.Phone,
-		IDCard: query.IDCard,
-		Name:   query.Name,
+	// 记录查询日志
+	if err := s.RecordQueryLog(ctx, merchantID, phone, ip, userAgent, exists); err != nil {
+		// 这里只记录日志错误,不影响主流程
+		log.Printf("记录查询日志失败: %v", err)
 	}
 
-	return s.repo.CheckExists(repoQuery)
+	return exists, nil
 }
 
 // GetByIDCard 根据身份证号获取用户信息
@@ -117,4 +126,27 @@ func (s *BlacklistService) GetByName(name string) ([]model.BlacklistUser, error)
 		return nil, fmt.Errorf("姓名不能为空")
 	}
 	return s.repo.GetByName(name)
+}
+
+// RecordQueryLog 记录查询日志
+func (s *BlacklistService) RecordQueryLog(ctx context.Context, merchantID uint, phone, ip, userAgent string, result bool) error {
+	log := &model.BlacklistQueryLog{
+		MerchantID: merchantID,
+		Phone:      phone,
+		QueryTime:  time.Now(),
+		IP:         ip,
+		UserAgent:  userAgent,
+		Result:     result,
+	}
+	return s.queryLogRepo.Create(ctx, log)
+}
+
+// GetQueryLogs 获取查询日志
+func (s *BlacklistService) GetQueryLogs(ctx context.Context, merchantID uint, page, pageSize int) ([]model.BlacklistQueryLog, int64, error) {
+	return s.queryLogRepo.FindByMerchantID(ctx, merchantID, page, pageSize)
+}
+
+// GetQueryLogsByPhone 获取指定手机号的查询日志
+func (s *BlacklistService) GetQueryLogsByPhone(ctx context.Context, phone string, page, pageSize int) ([]model.BlacklistQueryLog, int64, error) {
+	return s.queryLogRepo.FindByPhone(ctx, phone, page, pageSize)
 }

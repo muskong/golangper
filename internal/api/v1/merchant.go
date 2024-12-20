@@ -175,19 +175,55 @@ func (h *MerchantHandler) RegenerateAPICredentials(c *gin.Context) {
 // Login 商户登录
 func (h *MerchantHandler) Login(c *gin.Context) {
 	var req struct {
-		APIKey    string `json:"api_key"`
-		APISecret string `json:"api_secret"`
+		APIKey    string `json:"api_key" binding:"required"`
+		APISecret string `json:"api_secret" binding:"required"`
 	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.Error(c, http.StatusBadRequest, "无效的请求参数")
 		return
 	}
 
-	token, err := h.service.Login(req.APIKey, req.APISecret)
+	merchant, token, err := h.service.Login(
+		c.Request.Context(),
+		req.APIKey,
+		req.APISecret,
+		c.ClientIP(),
+		c.Request.UserAgent(),
+	)
+
 	if err != nil {
 		utils.Error(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	utils.Success(c, gin.H{"token": token})
+	utils.Success(c, gin.H{
+		"merchant": merchant,
+		"token":   token,
+	})
+}
+
+// GetLoginLogs 获取商户登录日志
+func (h *MerchantHandler) GetLoginLogs(c *gin.Context) {
+	merchantID := utils.GetCurrentMerchantID(c)
+	if merchantID == 0 {
+		utils.Error(c, http.StatusUnauthorized, "未授权访问")
+		return
+	}
+
+	page := utils.GetPage(c)
+	pageSize := utils.GetPageSize(c)
+
+	logs, total, err := h.service.GetLoginLogs(c.Request.Context(), merchantID, page, pageSize)
+	if err != nil {
+		utils.Error(c, http.StatusInternalServerError, "获取登录日志失败")
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":  logs,
+		"total": total,
+		"page":  page,
+		"size":  pageSize,
+	})
 }

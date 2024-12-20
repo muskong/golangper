@@ -266,3 +266,53 @@ func (h *BlacklistHandler) GetByName(c *gin.Context) {
 		"items": users,
 	})
 }
+
+// GetQueryLogs 获取黑名单查询日志
+func (h *BlacklistHandler) GetQueryLogs(c *gin.Context) {
+	merchantID := utils.GetCurrentMerchantID(c)
+	if merchantID == 0 {
+		utils.Error(c, http.StatusUnauthorized, "未授权访问")
+		return
+	}
+
+	page := utils.GetPage(c)
+	pageSize := utils.GetPageSize(c)
+
+	logs, total, err := h.service.GetQueryLogs(c.Request.Context(), merchantID, page, pageSize)
+	if err != nil {
+		utils.Error(c, http.StatusInternalServerError, "获取查询日志失败")
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":  logs,
+		"total": total,
+		"page":  page,
+		"size":  pageSize,
+	})
+}
+
+// GetQueryLogsByPhone 获取指定手机号的查询日志
+func (h *BlacklistHandler) GetQueryLogsByPhone(c *gin.Context) {
+	phone := c.Query("phone")
+	if phone == "" {
+		utils.Error(c, http.StatusBadRequest, "手机号不能为空")
+		return
+	}
+
+	page := utils.GetPage(c)
+	pageSize := utils.GetPageSize(c)
+
+	logs, total, err := h.service.GetQueryLogsByPhone(c.Request.Context(), phone, page, pageSize)
+	if err != nil {
+		utils.Error(c, http.StatusInternalServerError, "获取查询日志失败")
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":  logs,
+		"total": total,
+		"page":  page,
+		"size":  pageSize,
+	})
+}

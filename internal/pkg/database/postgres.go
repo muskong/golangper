@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"blacklist/internal/model"
 )
 
 type PostgresDB struct {
@@ -55,6 +56,10 @@ func NewPostgresDB(cfg *config.Config) (*PostgresDB, error) {
 		return nil, fmt.Errorf("数据库连接测试失败: %w", err)
 	}
 
+	if err := autoMigrate(db); err != nil {
+		return nil, fmt.Errorf("自动迁移失败: %w", err)
+	}
+
 	return &PostgresDB{DB: db}, nil
 }
 
@@ -65,4 +70,13 @@ func (db *PostgresDB) Close() error {
 		return err
 	}
 	return sqlDB.Close()
+}
+
+func autoMigrate(db *gorm.DB) error {
+	// 已有的模型...
+	err := db.AutoMigrate(
+		&model.Merchant{},
+		&model.MerchantLoginLog{},
+	)
+	return err
 }

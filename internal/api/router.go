@@ -37,6 +37,7 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			merchant.DELETE("/:id", merchantHandler.DeleteMerchant)
 			merchant.PUT("/:id/status", merchantHandler.UpdateMerchantStatus)
 			merchant.POST("/:id/regenerate", merchantHandler.RegenerateAPICredentials)
+			merchant.GET("/login-logs", middleware.AuthMiddleware(), merchantHandler.GetLoginLogs)
 		}
 	}
 
@@ -58,6 +59,8 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			blacklist.PUT("/:id", blacklistHandler.UpdateBlacklistUser)
 			blacklist.GET("/check", blacklistHandler.CheckPhoneExists)
 			blacklist.GET("/exists", blacklistHandler.CheckExists)
+			blacklist.GET("/query-logs", blacklistHandler.GetQueryLogs)           // 获取商户的查询日志
+			blacklist.GET("/query-logs/phone", blacklistHandler.GetQueryLogsByPhone) // 获取指定手机号的查询日志
 		}
 	}
 }
