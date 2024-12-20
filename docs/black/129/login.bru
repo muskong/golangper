@@ -1,0 +1,18 @@
+meta {
+  name: login
+  type: http
+  seq: 7
+}
+
+post {
+  url: https://blackuser.injob.top/api/v1/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "api_key": "123",
+    "api_secret": "456"
+  }
+}

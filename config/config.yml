@@ -6,9 +6,9 @@ database:
   driver: postgres
   host: 127.0.0.1
   port: 5432
-  username: postgres
-  password: password
-  dbname: blacklist
+  username: blackuser
+  password: ZaX0VFi3BNfApBUuBQucTk7rI08plgIt
+  dbname: blacksystems
   sslmode: disable
 
 redis:
