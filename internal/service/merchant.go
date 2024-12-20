@@ -136,7 +136,7 @@ func (s *MerchantService) Login(apiKey, apiSecret string) (string, error) {
 	}
 
 	if merchant.APISecret != apiSecret {
-		return "", fmt.Errorf("API Secret不正确")
+		return "", fmt.Errorf("API Secret不正确, %s != %s", merchant.APISecret, apiSecret)
 	}
 
 	// 生成Token

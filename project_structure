@@ -1,23 +1,60 @@
-blacklist/
-├── api/
-│   └── v1/
-├── cmd/
-│   └── server/
-├── config/
-├── docs/
-├── internal/
-│   ├── middleware/
-│   ├── model/
-│   ├── repository/
-│   └── service/
-├── pkg/
-│   ├── jwt/
-│   ├── logger/
-│   └── utils/
-├── scripts/
-├── web/
-├── .gitignore
-├── Dockerfile
-├── docker-compose.yml
-├── go.mod
-└── README.md 
+.
+|-- Dockerfile
+|-- blacklist.service
+|-- cmd
+|   `-- server
+|       `-- main.go
+|-- config
+|   |-- config.go
+|   `-- config.yml
+|-- docker-compose.yml
+|-- docs
+|   |-- CREATE.sql
+|   |-- data.sql
+|   |-- data.txt
+|   `-- data\343\200\2022.txt
+|-- generate.md
+|-- go.mod
+|-- go.sum
+|-- internal
+|   |-- api
+|   |   |-- router.go
+|   |   `-- v1
+|   |       |-- blacklist.go
+|   |       `-- merchant.go
+|   |-- config
+|   |   `-- config.go
+|   |-- middleware
+|   |   |-- auth.go
+|   |   |-- cors.go
+|   |   |-- jwt.go
+|   |   |-- logger.go
+|   |   |-- ratelimit.go
+|   |   `-- response.go
+|   |-- model
+|   |   |-- blacklist.go
+|   |   `-- merchant.go
+|   |-- pkg
+|   |   |-- database
+|   |   |   |-- migrations
+|   |   |   |   |-- 000002_add_blacklist_indexes.down.sql
+|   |   |   |   |-- 000002_add_blacklist_indexes.up.sql
+|   |   |   |   |-- 000003_create_merchants_table.down.sql
+|   |   |   |   `-- 000003_create_merchants_table.up.sql
+|   |   |   `-- postgres.go
+|   |   `-- redis
+|   |       `-- redis.go
+|   |-- repository
+|   |   |-- blacklist.go
+|   |   `-- merchant.go
+|   `-- service
+|       |-- blacklist.go
+|       `-- merchant.go
+|-- pkg
+|   `-- utils
+|       |-- jwt.go
+|       |-- response.go
+|       `-- validator.go
+`-- project_structure
+
+19 directories, 39 files
