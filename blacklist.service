@@ -4,7 +4,7 @@ Description="blacklist service"
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/sites/blacklist
+WorkingDirectory=/sites/blacklist/cmd/build
 ExecStart=/sites/blacklist/cmd/build/blackusers
 ExecStop=/bin/kill -15 $MAINPID
 Restart=always
