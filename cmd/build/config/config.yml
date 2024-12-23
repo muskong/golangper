@@ -1,6 +1,6 @@
 server:
   port: 8080
-  mode: debug
+  mode: release
 
 database:
   driver: postgres
@@ -18,7 +18,7 @@ redis:
   db: 0
 
 jwt:
-  secret: your-secret-key
+  secret: ApBUuBQucTk7rI0O
   expire: 24h
 
 log:
