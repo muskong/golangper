@@ -1,8 +1,8 @@
 package service
 
 import (
-	"crypto/rand"
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"time"
@@ -13,7 +13,7 @@ import (
 )
 
 type MerchantService struct {
-	repo *repository.MerchantRepository
+	repo         *repository.MerchantRepository
 	loginLogRepo repository.MerchantLoginLogRepository
 }
 
@@ -22,7 +22,7 @@ func NewMerchantService(
 	loginLogRepo repository.MerchantLoginLogRepository,
 ) *MerchantService {
 	return &MerchantService{
-		repo: repo,
+		repo:         repo,
 		loginLogRepo: loginLogRepo,
 	}
 }
@@ -132,7 +132,7 @@ func (s *MerchantService) RegenerateAPICredentials(id uint) (*model.Merchant, er
 	return merchant, nil
 }
 
-// RecordLoginLog 记录登录日��
+// RecordLoginLog 记录登录日志
 func (s *MerchantService) RecordLoginLog(ctx context.Context, merchantID uint, ip, userAgent string, status int, remark string) error {
 	log := &model.MerchantLoginLog{
 		MerchantID: merchantID,
