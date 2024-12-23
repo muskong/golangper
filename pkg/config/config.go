@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -55,11 +56,40 @@ func Init() error {
 	// 设置默认值
 	setDefaults()
 
+	// 读取配置文件
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")
-	viper.AddConfigPath(".") // 添加多个配置路径
-	viper.AutomaticEnv()     // 支持环境变量覆盖
+	viper.AddConfigPath(".")
+
+	// 配置 Viper 读取环境变量
+	viper.SetEnvPrefix("APP") // 环境变量前缀，可选
+	viper.AutomaticEnv()      // 启用环境变量读取
+
+	// 设置环境变量与配置键的映射关系
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+
+	// 绑定特定的环境变量
+	viper.BindEnv("server.port", "SERVER_PORT")
+	viper.BindEnv("server.mode", "SERVER_MODE")
+	viper.BindEnv("database.host", "DB_HOST")
+	viper.BindEnv("database.port", "DB_PORT")
+	viper.BindEnv("database.username", "DB_USER")
+	viper.BindEnv("database.password", "DB_PASSWORD")
+	viper.BindEnv("database.dbname", "DB_NAME")
+	viper.BindEnv("database.sslmode", "DB_SSLMODE")
+	viper.BindEnv("redis.host", "REDIS_HOST")
+	viper.BindEnv("redis.port", "REDIS_PORT")
+	viper.BindEnv("redis.password", "REDIS_PASSWORD")
+	viper.BindEnv("redis.db", "REDIS_DB")
+	viper.BindEnv("jwt.secret", "JWT_SECRET")
+	viper.BindEnv("jwt.expire", "JWT_EXPIRE")
+	viper.BindEnv("log.level", "LOG_LEVEL")
+	viper.BindEnv("log.filename", "LOG_FILENAME")
+	viper.BindEnv("log.maxsize", "LOG_MAXSIZE")
+	viper.BindEnv("log.maxage", "LOG_MAXAGE")
+	viper.BindEnv("log.maxbackups", "LOG_MAXBACKUPS")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return fmt.Errorf("读取配置文件失败: %w", err)
