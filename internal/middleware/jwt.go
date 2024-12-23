@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"blacklist/internal/config"
+	"blacklist/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

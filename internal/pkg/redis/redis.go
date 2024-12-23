@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 
-	"blacklist/config"
+	"blacklist/pkg/config"
 
 	"github.com/go-redis/redis/v8"
 )
 
 var RDB *redis.Client
 
-func InitRedis(cfg *config.Config) error {
+func InitRedis(cfg *config.RedisConfig) error {
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
-		Password: cfg.Redis.Password,
-		DB:       cfg.Redis.DB,
+		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Password: cfg.Password,
+		DB:       cfg.DB,
 	})
 
 	_, err := RDB.Ping(context.Background()).Result()

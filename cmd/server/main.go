@@ -7,11 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"blacklist/config"
 	"blacklist/internal/api"
 	"blacklist/internal/middleware"
 	"blacklist/internal/pkg/database"
 	"blacklist/internal/pkg/redis"
+	"blacklist/pkg/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,17 +21,10 @@ func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 
 	// 加载配置
-	cfg, err := config.LoadConfig()
+	err := config.Init()
 	if err != nil {
 		log.Fatalf("加载配置失败: %v", err)
 	}
-
-	// 初始化数据库连接
-	db, err := database.NewPostgresDB(cfg)
-	if err != nil {
-		log.Fatalf("初始化数据库失败: %v", err)
-	}
-	defer db.Close()
 
 	// 优雅关闭
 	quit := make(chan os.Signal, 1)
@@ -56,13 +49,20 @@ func main() {
 		log.Println("服务已关闭")
 	}()
 
+	// 初始化数据库连接
+	db, err := database.NewPostgresDB(&config.Cfg.Database)
+	if err != nil {
+		log.Fatalf("初始化数据库失败: %v", err)
+	}
+	defer db.Close()
+
 	// 初始化Redis连接
-	if err := redis.InitRedis(cfg); err != nil {
+	if err := redis.InitRedis(&config.Cfg.Redis); err != nil {
 		log.Fatalf("Redis初始化失败: %v", err)
 	}
 
 	// 设置运行模式
-	gin.SetMode(cfg.Server.Mode)
+	gin.SetMode(config.Cfg.Server.Mode)
 
 	// 创建Gin引擎
 	app := gin.New()
@@ -76,7 +76,7 @@ func main() {
 	api.RegisterRoutes(app, db)
 
 	// 启动服务器
-	if err := app.Run(":" + cfg.Server.Port); err != nil {
+	if err := app.Run(":" + config.Cfg.Server.Port); err != nil {
 		log.Fatalf("服务器启动失败: %v", err)
 	}
 

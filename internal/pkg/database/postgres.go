@@ -1,29 +1,30 @@
 package database
 
 import (
-	"blacklist/config"
 	"context"
 	"fmt"
 	"time"
 
+	"blacklist/internal/model"
+	"blacklist/pkg/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"blacklist/internal/model"
 )
 
 type PostgresDB struct {
 	*gorm.DB
 }
 
-func NewPostgresDB(cfg *config.Config) (*PostgresDB, error) {
+func NewPostgresDB(cfg *config.DatabaseConfig) (*PostgresDB, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.DBName,
-		cfg.Database.SSLMode,
+		cfg.Host,
+		cfg.Port,
+		cfg.User,
+		cfg.Password,
+		cfg.DBName,
+		cfg.SSLMode,
 	)
 
 	gormConfig := &gorm.Config{

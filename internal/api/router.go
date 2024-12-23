@@ -26,9 +26,22 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 	blacklistService := service.NewBlacklistService(blacklistRepo, blacklistQueryLogRepo)
 	blacklistHandler := v1.NewBlacklistHandler(blacklistService)
 
+	adminRepo := repository.NewAdminRepository(db)
+	adminService := service.NewAdminService(adminRepo)
+	adminHandler := v1.NewAdminHandler(adminService)
+
 	adminGroup := r.Group("/admin")
 	{
 		adminGroup.Use(middleware.MerchantAuth(merchantService))
+		// 管理员相关接口
+		admin := adminGroup.Group("/admin")
+		{
+			admin.GET("", adminHandler.ListAdmins)
+			admin.GET("/:id", adminHandler.GetAdmin)
+			admin.POST("", adminHandler.CreateAdmin)
+			admin.PUT("/:id", adminHandler.UpdateAdmin)
+			admin.DELETE("/:id", adminHandler.DeleteAdmin)
+		}
 		// 商户管理
 		merchant := adminGroup.Group("/merchants")
 		{

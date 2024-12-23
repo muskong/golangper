@@ -7,6 +7,10 @@ import (
 )
 
 type Config struct {
+	Server struct {
+		Port string `mapstructure:"port" validate:"required"`
+		Mode string `mapstructure:"mode" validate:"required,oneof=debug release"`
+	} `mapstructure:"server"`
 	Database struct {
 		Host     string `mapstructure:"host" validate:"required"`
 		Port     int    `mapstructure:"port" validate:"required,min=1,max=65535"`
@@ -21,10 +25,6 @@ type Config struct {
 		Password string `mapstructure:"password"`
 		DB       int    `mapstructure:"db" validate:"min=0"`
 	} `mapstructure:"redis"`
-	Server struct {
-		Port string `mapstructure:"port" validate:"required"`
-		Mode string `mapstructure:"mode" validate:"required,oneof=debug release"`
-	} `mapstructure:"server"`
 }
 
 func LoadConfig() (*Config, error) {
