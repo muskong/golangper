@@ -211,7 +211,7 @@ func (h *BlacklistHandler) CheckExists(c *gin.Context) {
 		return
 	}
 
-	exists, err := h.service.CheckExists(query)
+	exists, err := h.service.CheckExists(c, query)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "检查失败")
 		return

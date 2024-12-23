@@ -12,19 +12,34 @@ import (
 	"blacklist/internal/pkg/redis"
 )
 
-type BlacklistRepository struct {
+type BlacklistRepository interface {
+	Create(user *model.BlacklistUser) error
+	GetByID(id uint) (*model.BlacklistUser, error)
+	Update(user *model.BlacklistUser) error
+	Delete(id uint) error
+	List(query *BlacklistUserQuery) ([]model.BlacklistUser, int64, error)
+	ExistsByPhone(phone string) (bool, error)
+	GetByPhone(phone string) (*model.BlacklistUser, error)
+	CheckExists(query *ExistsQuery) (bool, error)
+	GetByIDCard(idCard string) (*model.BlacklistUser, error)
+	GetByName(name string) ([]model.BlacklistUser, error)
+}
+
+// 将现有的结构体重命名
+type blacklistRepository struct {
 	db *database.PostgresDB
 }
 
-func NewBlacklistRepository(db *database.PostgresDB) *BlacklistRepository {
-	return &BlacklistRepository{db: db}
+// 修改构造函数返回接口类型
+func NewBlacklistRepository(db *database.PostgresDB) BlacklistRepository {
+	return &blacklistRepository{db: db}
 }
 
-func (r *BlacklistRepository) Create(user *model.BlacklistUser) error {
+func (r *blacklistRepository) Create(user *model.BlacklistUser) error {
 	return r.db.Create(user).Error
 }
 
-func (r *BlacklistRepository) GetByID(id uint) (*model.BlacklistUser, error) {
+func (r *blacklistRepository) GetByID(id uint) (*model.BlacklistUser, error) {
 	var user model.BlacklistUser
 
 	// 先从Redis缓存中获取
@@ -48,7 +63,7 @@ func (r *BlacklistRepository) GetByID(id uint) (*model.BlacklistUser, error) {
 	return &user, nil
 }
 
-func (r *BlacklistRepository) Update(user *model.BlacklistUser) error {
+func (r *blacklistRepository) Update(user *model.BlacklistUser) error {
 	// 更新数据库
 	if err := r.db.Save(user).Error; err != nil {
 		return err
@@ -63,7 +78,7 @@ func (r *BlacklistRepository) Update(user *model.BlacklistUser) error {
 	return nil
 }
 
-func (r *BlacklistRepository) Delete(id uint) error {
+func (r *blacklistRepository) Delete(id uint) error {
 	// 删除数据库记录
 	if err := r.db.Delete(&model.BlacklistUser{}, id).Error; err != nil {
 		return err
@@ -89,7 +104,7 @@ type BlacklistUserQuery struct {
 }
 
 // 修改 List 方法
-func (r *BlacklistRepository) List(query *BlacklistUserQuery) ([]model.BlacklistUser, int64, error) {
+func (r *blacklistRepository) List(query *BlacklistUserQuery) ([]model.BlacklistUser, int64, error) {
 	var users []model.BlacklistUser
 	var total int64
 
@@ -132,7 +147,7 @@ func (r *BlacklistRepository) List(query *BlacklistUserQuery) ([]model.Blacklist
 }
 
 // ExistsByPhone 检查指定手机号的用户是否存在
-func (r *BlacklistRepository) ExistsByPhone(phone string) (bool, error) {
+func (r *blacklistRepository) ExistsByPhone(phone string) (bool, error) {
 	var count int64
 	err := r.db.Model(&model.BlacklistUser{}).
 		Where("phone = ?", phone).
@@ -145,7 +160,7 @@ func (r *BlacklistRepository) ExistsByPhone(phone string) (bool, error) {
 }
 
 // GetByPhone 根据手机号获取用户信息
-func (r *BlacklistRepository) GetByPhone(phone string) (*model.BlacklistUser, error) {
+func (r *blacklistRepository) GetByPhone(phone string) (*model.BlacklistUser, error) {
 	var user model.BlacklistUser
 
 	// 先从Redis缓存中获取
@@ -177,7 +192,7 @@ type ExistsQuery struct {
 }
 
 // CheckExists 检查用户是否存在
-func (r *BlacklistRepository) CheckExists(query *ExistsQuery) (bool, error) {
+func (r *blacklistRepository) CheckExists(query *ExistsQuery) (bool, error) {
 	var count int64
 	db := r.db.Model(&model.BlacklistUser{})
 
@@ -213,7 +228,7 @@ func (r *BlacklistRepository) CheckExists(query *ExistsQuery) (bool, error) {
 }
 
 // GetByIDCard 根据身份证号获取用户信息
-func (r *BlacklistRepository) GetByIDCard(idCard string) (*model.BlacklistUser, error) {
+func (r *blacklistRepository) GetByIDCard(idCard string) (*model.BlacklistUser, error) {
 	var user model.BlacklistUser
 
 	// 先从Redis缓存中获取
@@ -238,7 +253,7 @@ func (r *BlacklistRepository) GetByIDCard(idCard string) (*model.BlacklistUser, 
 }
 
 // GetByName 根据姓名获取用户信息列表
-func (r *BlacklistRepository) GetByName(name string) ([]model.BlacklistUser, error) {
+func (r *blacklistRepository) GetByName(name string) ([]model.BlacklistUser, error) {
 	var users []model.BlacklistUser
 
 	// 从数据库中获取

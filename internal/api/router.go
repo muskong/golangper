@@ -17,15 +17,18 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 
 	// 初始化依赖
 	merchantRepo := repository.NewMerchantRepository(db)
-	merchantService := service.NewMerchantService(merchantRepo)
+	merchantLoginLogRepo := repository.NewMerchantLoginLogRepository(db)
+	merchantService := service.NewMerchantService(merchantRepo, merchantLoginLogRepo)
 	merchantHandler := v1.NewMerchantHandler(merchantService)
 
 	blacklistRepo := repository.NewBlacklistRepository(db)
-	blacklistService := service.NewBlacklistService(blacklistRepo)
+	blacklistQueryLogRepo := repository.NewBlacklistQueryLogRepository(db)
+	blacklistService := service.NewBlacklistService(blacklistRepo, blacklistQueryLogRepo)
 	blacklistHandler := v1.NewBlacklistHandler(blacklistService)
 
 	adminGroup := r.Group("/admin")
 	{
+		adminGroup.Use(middleware.MerchantAuth(merchantService))
 		// 商户管理
 		merchant := adminGroup.Group("/merchants")
 		{
@@ -37,16 +40,19 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 			merchant.DELETE("/:id", merchantHandler.DeleteMerchant)
 			merchant.PUT("/:id/status", merchantHandler.UpdateMerchantStatus)
 			merchant.POST("/:id/regenerate", merchantHandler.RegenerateAPICredentials)
-			merchant.GET("/login-logs", middleware.AuthMiddleware(), merchantHandler.GetLoginLogs)
+			merchant.GET("/login-logs", merchantHandler.GetLoginLogs)
 		}
 
 		// 黑名单管理
 		blacklist := adminGroup.Group("/blacklist")
 		{
+			blacklist.GET("", blacklistHandler.ListBlacklistUsers)
+			blacklist.GET("/:id", blacklistHandler.GetBlacklistUser)
+			blacklist.PUT("/:id", blacklistHandler.UpdateBlacklistUser)
 			// 查询日志相关接口
-			blacklist.GET("/query-logs", blacklistHandler.GetAllQueryLogs)           // 获取所有查询日志
+			blacklist.GET("/query-logs", blacklistHandler.GetAllQueryLogs)                   // 获取所有查询日志
 			blacklist.GET("/query-logs/merchant/:id", blacklistHandler.GetMerchantQueryLogs) // 获取指定商户的查询日志
-			blacklist.GET("/query-logs/phone", blacklistHandler.GetPhoneQueryLogs)   // 获取指定手机号的查询日志
+			blacklist.GET("/query-logs/phone", blacklistHandler.GetPhoneQueryLogs)           // 获取指定手机号的查询日志
 		}
 	}
 
@@ -62,10 +68,7 @@ func RegisterRoutes(r *gin.Engine, db *database.PostgresDB) {
 		blacklist.Use(middleware.RateLimit(100, time.Minute)) // 限制每分钟100次请求
 		{
 			// 黑名单相关接口
-			blacklist.GET("", blacklistHandler.ListBlacklistUsers)
 			blacklist.POST("", blacklistHandler.CreateBlacklistUser)
-			blacklist.GET("/:id", blacklistHandler.GetBlacklistUser)
-			blacklist.PUT("/:id", blacklistHandler.UpdateBlacklistUser)
 			blacklist.GET("/check", blacklistHandler.CheckPhoneExists)
 			blacklist.GET("/exists", blacklistHandler.CheckExists)
 		}

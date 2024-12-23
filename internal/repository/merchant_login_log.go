@@ -1,9 +1,9 @@
 package repository
 
 import (
+	"blacklist/internal/model"
+	"blacklist/internal/pkg/database"
 	"context"
-	"payment-gateway/internal/model"
-	"gorm.io/gorm"
 )
 
 type MerchantLoginLogRepository interface {
@@ -12,10 +12,10 @@ type MerchantLoginLogRepository interface {
 }
 
 type merchantLoginLogRepository struct {
-	db *gorm.DB
+	db *database.PostgresDB
 }
 
-func NewMerchantLoginLogRepository(db *gorm.DB) MerchantLoginLogRepository {
+func NewMerchantLoginLogRepository(db *database.PostgresDB) MerchantLoginLogRepository {
 	return &merchantLoginLogRepository{db: db}
 }
 

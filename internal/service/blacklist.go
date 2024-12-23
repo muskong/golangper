@@ -3,15 +3,17 @@ package service
 import (
 	"blacklist/internal/model"
 	"blacklist/internal/repository"
-	"fmt"
 	"context"
-	"time"
+	"fmt"
 	"log"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BlacklistService struct {
-	repo          repository.BlacklistRepository
-	queryLogRepo  repository.BlacklistQueryLogRepository
+	repo         repository.BlacklistRepository
+	queryLogRepo repository.BlacklistQueryLogRepository
 }
 
 func NewBlacklistService(
@@ -97,14 +99,14 @@ type ExistsQuery struct {
 }
 
 // CheckExists 检查用户是否存在
-func (s *BlacklistService) CheckExists(ctx context.Context, phone string, merchantID uint, ip, userAgent string) (bool, error) {
-	exists, err := s.repo.ExistsByPhone(ctx, phone)
+func (s *BlacklistService) CheckExists(ctx *gin.Context, query *ExistsQuery) (bool, error) {
+	exists, err := s.repo.ExistsByPhone(query.Phone)
 	if err != nil {
 		return false, err
 	}
 
 	// 记录查询日志
-	if err := s.RecordQueryLog(ctx, merchantID, phone, ip, userAgent, exists); err != nil {
+	if err := s.RecordQueryLog(ctx, query, exists); err != nil {
 		// 这里只记录日志错误,不影响主流程
 		log.Printf("记录查询日志失败: %v", err)
 	}
@@ -129,13 +131,15 @@ func (s *BlacklistService) GetByName(name string) ([]model.BlacklistUser, error)
 }
 
 // RecordQueryLog 记录查询日志
-func (s *BlacklistService) RecordQueryLog(ctx context.Context, merchantID uint, phone, ip, userAgent string, result bool) error {
+func (s *BlacklistService) RecordQueryLog(ctx *gin.Context, query *ExistsQuery, result bool) error {
+	merchantID := ctx.GetUint("merchant_id")
+
 	log := &model.BlacklistQueryLog{
 		MerchantID: merchantID,
-		Phone:      phone,
+		Phone:      query.Phone,
 		QueryTime:  time.Now(),
-		IP:         ip,
-		UserAgent:  userAgent,
+		IP:         ctx.ClientIP(),
+		UserAgent:  ctx.Request.UserAgent(),
 		Result:     result,
 	}
 	return s.queryLogRepo.Create(ctx, log)

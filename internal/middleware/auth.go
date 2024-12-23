@@ -51,6 +51,7 @@ func MerchantAuth(merchantService *service.MerchantService) gin.HandlerFunc {
 
 		// 将商户ID存入上下文
 		c.Set("merchant_id", merchant.ID)
+		c.Set("merchant_name", merchant.Name)
 		c.Next()
 	}
 }

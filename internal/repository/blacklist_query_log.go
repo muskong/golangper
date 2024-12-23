@@ -1,8 +1,10 @@
 package repository
 
 import (
-	"context"
 	"blacklist/internal/model"
+	"blacklist/internal/pkg/database"
+	"context"
+
 	"gorm.io/gorm"
 )
 
@@ -14,10 +16,10 @@ type BlacklistQueryLogRepository interface {
 }
 
 type blacklistQueryLogRepository struct {
-	db *gorm.DB
+	db *database.PostgresDB
 }
 
-func NewBlacklistQueryLogRepository(db *gorm.DB) BlacklistQueryLogRepository {
+func NewBlacklistQueryLogRepository(db *database.PostgresDB) BlacklistQueryLogRepository {
 	return &blacklistQueryLogRepository{db: db}
 }
 
@@ -60,5 +62,5 @@ func (r *blacklistQueryLogRepository) FindByPhone(ctx context.Context, phone str
 }
 
 func (r *blacklistQueryLogRepository) DB() *gorm.DB {
-	return r.db
+	return r.db.DB
 }
