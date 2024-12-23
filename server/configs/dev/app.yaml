@@ -1,0 +1,8 @@
+server:
+  port: 8080
+  mode: development
+
+database:
+  host: localhost
+  port: 3306
+  name: myapp_dev 

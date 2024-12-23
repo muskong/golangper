@@ -1,0 +1,25 @@
+app:
+  name: blackapp
+  mode: debug
+  port: 8080
+
+database:
+  host: postgres
+  port: 5432
+  user: postgres
+  password: postgres
+  dbname: blackapp
+  sslmode: disable
+
+redis:
+  host: redis
+  port: 6379
+  password: ""
+  db: 0
+
+log:
+  filename: ./logs/app.log
+  maxsize: 100
+  maxage: 7
+  maxbackups: 10
+  level: debug

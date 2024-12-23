@@ -18,10 +18,12 @@
 |-- go.sum
 |-- internal
 |   |-- api
+|   |   |-- handler.go
+|   |   |-- middleware.go
 |   |   |-- router.go
-|   |   `-- v1
-|   |       |-- blacklist.go
-|   |       `-- merchant.go
+|   |   |-- model.go
+|   |   |-- service.go
+|   |   `-- repository.go
 |   |-- config
 |   |   `-- config.go
 |   |-- middleware
@@ -33,7 +35,9 @@
 |   |   `-- response.go
 |   |-- model
 |   |   |-- blacklist.go
-|   |   `-- merchant.go
+|   |   |-- merchant.go
+|   |   |-- admin.go
+|   |   |-- system_log.go
 |   |-- pkg
 |   |   |-- database
 |   |   |   |-- migrations
@@ -46,10 +50,14 @@
 |   |       `-- redis.go
 |   |-- repository
 |   |   |-- blacklist.go
-|   |   `-- merchant.go
+|   |   |-- merchant.go
+|   |   |-- admin.go
+|   |   `-- redis.go
 |   `-- service
 |       |-- blacklist.go
-|       `-- merchant.go
+|       |-- merchant.go
+|       |-- admin.go
+|       `-- system.go
 |-- pkg
 |   `-- utils
 |       |-- jwt.go
