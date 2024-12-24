@@ -24,7 +24,6 @@ func main() {
 	if err := database.Init(); err != nil {
 		log.Fatalf("初始化数据库失败: %v", err)
 	}
-
 	// 初始化路由
 	r := router.InitRouter()
 

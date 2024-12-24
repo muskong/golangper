@@ -21,15 +21,22 @@ func InitRouter() *gin.Engine {
 		// 处理错误
 	}
 
+	// 初始化系统服务依赖
+	adminRepo := persistence.NewAdminRepository()
+	loginLogRepo := persistence.NewLoginLogRepository()
+	queryLogRepo := persistence.NewQueryLogRepository()
+
 	// 初始化依赖
 	merchantRepo := persistence.NewMerchantRepository()
 	blacklistRepo := persistence.NewBlacklistRepository()
+	systemService := impl.NewSystemService(adminRepo, loginLogRepo, queryLogRepo, jwtSecret, tokenExpire)
 
 	merchantService := impl.NewMerchantService(merchantRepo, jwtSecret, tokenExpire)
 	blacklistService := impl.NewBlacklistService(blacklistRepo)
 
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 	blacklistHandler := handler.NewBlacklistHandler(blacklistService)
+	systemHandler := handler.NewSystemHandler(systemService)
 
 	// 公开接口
 	public := r.Group("/api/v1")
@@ -63,6 +70,26 @@ func InitRouter() *gin.Engine {
 			blacklists.GET("", blacklistHandler.List)
 			blacklists.PUT("/:id/status", blacklistHandler.UpdateStatus)
 			blacklists.POST("/check", blacklistHandler.Check)
+		}
+
+		// 系统监控
+		authorized.GET("/system/metrics", systemHandler.GetSystemMetrics)
+
+		// 管理员管理
+		admins := authorized.Group("/admins")
+		{
+			admins.POST("/login", systemHandler.AdminLogin)
+			admins.POST("", systemHandler.CreateAdmin)
+			admins.PUT("/:id", systemHandler.UpdateAdmin)
+			admins.GET("", systemHandler.ListAdmins)
+			admins.PUT("/:id/status", systemHandler.UpdateAdminStatus)
+		}
+
+		// 日志管理
+		logs := authorized.Group("/logs")
+		{
+			logs.GET("/login", systemHandler.ListLoginLogs)
+			logs.GET("/query", systemHandler.ListQueryLogs)
 		}
 	}
 
