@@ -1,7 +1,7 @@
 app:
   name: blackapp
   mode: debug
-  port: 8080
+  address: 0.0.0.0:8081
 
 database:
   driver: postgres

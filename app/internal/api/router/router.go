@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,15 +11,23 @@ import (
 	"blackapp/internal/infrastructure/persistence"
 	"blackapp/internal/service/impl"
 	"blackapp/pkg/config"
+	"blackapp/pkg/database"
 )
 
 func InitRouter() *gin.Engine {
-	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	app := gin.New()
+	// 注册中间件
+	app.Use(gin.Logger())
+	app.Use(gin.Recovery())
+	// app.Use(middleware.Logger())
+	// app.Use(middleware.Cors())
 
 	jwtSecret := config.GetString("jwt.secret")
 	tokenExpire, err := time.ParseDuration(config.GetString("jwt.token_expire"))
 	if err != nil {
 		// 处理错误
+		log.Fatalf("解析token过期时间失败: %v", err)
 	}
 
 	// 初始化系统服务依赖
@@ -29,7 +38,15 @@ func InitRouter() *gin.Engine {
 	// 初始化依赖
 	merchantRepo := persistence.NewMerchantRepository()
 	blacklistRepo := persistence.NewBlacklistRepository()
-	systemService := impl.NewSystemService(adminRepo, loginLogRepo, queryLogRepo, jwtSecret, tokenExpire)
+	systemService := impl.NewSystemService(
+		adminRepo,
+		loginLogRepo,
+		queryLogRepo,
+		jwtSecret,
+		tokenExpire,
+		database.RDB,
+		database.DB,
+	)
 
 	merchantService := impl.NewMerchantService(merchantRepo, jwtSecret, tokenExpire)
 	blacklistService := impl.NewBlacklistService(blacklistRepo)
@@ -39,13 +56,13 @@ func InitRouter() *gin.Engine {
 	systemHandler := handler.NewSystemHandler(systemService)
 
 	// 公开接口
-	public := r.Group("/api/v1")
+	public := app.Group("/api/v1")
 	{
 		public.POST("/merchants/login", merchantHandler.Login)
 	}
 
 	// 需要认证的接口
-	authorized := r.Group("/api/v1")
+	authorized := app.Group("/api/v1")
 	authorized.Use(middleware.JWTAuth())
 	{
 		// 商户管理
@@ -93,5 +110,5 @@ func InitRouter() *gin.Engine {
 		}
 	}
 
-	return r
+	return app
 }

@@ -13,6 +13,7 @@ func Init() error {
 		return err
 	}
 
+	viper.WatchConfig()
 	return nil
 }
 

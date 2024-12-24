@@ -5,18 +5,19 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"runtime"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/mem"
 	"go.uber.org/zap"
 
 	"blackapp/internal/domain/entity"
 	"blackapp/internal/domain/repository"
 	"blackapp/internal/service/dto"
 	"blackapp/pkg/logger"
+	"blackapp/pkg/monitor"
+
+	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 )
 
 type systemService struct {
@@ -25,6 +26,8 @@ type systemService struct {
 	queryLogRepo repository.QueryLogRepository
 	jwtSecret    string
 	tokenExpire  time.Duration
+	rdb          *redis.Client
+	db           *gorm.DB
 }
 
 func NewSystemService(
@@ -33,6 +36,8 @@ func NewSystemService(
 	queryLogRepo repository.QueryLogRepository,
 	jwtSecret string,
 	tokenExpire time.Duration,
+	rdb *redis.Client,
+	db *gorm.DB,
 ) *systemService {
 	return &systemService{
 		adminRepo:    adminRepo,
@@ -40,42 +45,41 @@ func NewSystemService(
 		queryLogRepo: queryLogRepo,
 		jwtSecret:    jwtSecret,
 		tokenExpire:  tokenExpire,
+		rdb:          rdb,
+		db:           db,
 	}
 }
 
 func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetrics, error) {
 	metrics := &dto.SystemMetrics{}
 
-	// CPU信息
-	cpuPercent, err := cpu.Percent(time.Second, false)
+	// 获取CPU信息
+	cpuInfo, err := monitor.GetCPUInfo()
 	if err != nil {
 		return nil, err
 	}
-	cpuInfo, err := cpu.Info()
+	metrics.CPU = *cpuInfo
+
+	// 获取内存信息
+	memInfo, err := monitor.GetMemoryInfo()
 	if err != nil {
 		return nil, err
 	}
-	metrics.CPU.Usage = cpuPercent[0]
-	metrics.CPU.Cores = runtime.NumCPU()
-	if len(cpuInfo) > 0 {
-		metrics.CPU.ModelName = cpuInfo[0].ModelName
-	}
+	metrics.Memory = *memInfo
 
-	// 内存信息
-	memInfo, err := mem.VirtualMemory()
+	// 获取Redis信息
+	redisInfo, err := monitor.GetRedisInfo(s.rdb)
 	if err != nil {
 		return nil, err
 	}
-	metrics.Memory.Total = memInfo.Total
-	metrics.Memory.Used = memInfo.Used
-	metrics.Memory.Free = memInfo.Free
-	metrics.Memory.UsageRate = memInfo.UsedPercent
+	metrics.Redis = *redisInfo
 
-	// Redis信息
-	// TODO: 实现Redis信息采集
-
-	// PostgreSQL信息
-	// TODO: 实现PostgreSQL信息采集
+	// 获取PostgreSQL信息
+	pgInfo, err := monitor.GetPostgresInfo(s.db)
+	if err != nil {
+		return nil, err
+	}
+	metrics.Postgres = *pgInfo
 
 	return metrics, nil
 }

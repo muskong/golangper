@@ -18,7 +18,12 @@ func NewSystemHandler(systemService service.SystemService) *SystemHandler {
 	return &SystemHandler{systemService: systemService}
 }
 
-// GetSystemMetrics 获取系统指标
+// @Summary 获取系统指标
+// @Description 获取当前系统的CPU、内存、Redis和PostgreSQL信息
+// @Tags 系统监控
+// @Produce json
+// @Success 200 {object} dto.SystemMetrics
+// @Router /system/metrics [get]
 func (h *SystemHandler) GetSystemMetrics(c *gin.Context) {
 	metrics, err := h.systemService.GetSystemMetrics(c.Request.Context())
 	if err != nil {
@@ -28,7 +33,14 @@ func (h *SystemHandler) GetSystemMetrics(c *gin.Context) {
 	response.Success(c, metrics)
 }
 
-// AdminLogin 管理员登录
+// @Summary 管理员登录
+// @Description 管理员使用用户名和密码登录
+// @Tags 管理员管理
+// @Accept json
+// @Produce json
+// @Param request body dto.AdminLoginDTO true "登录请求"
+// @Success 200 {object} map[string]string{"token": "string"}
+// @Router /admins/login [post]
 func (h *SystemHandler) AdminLogin(c *gin.Context) {
 	var req dto.AdminLoginDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
