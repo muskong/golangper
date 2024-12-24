@@ -11,11 +11,11 @@ import (
 )
 
 type BlacklistHandler struct {
-	blackappService service.BlacklistService
+	blacklistService service.BlacklistService
 }
 
-func NewBlacklistHandler(blackappService service.BlacklistService) *BlacklistHandler {
-	return &BlacklistHandler{blackappService: blacklistService}
+func NewBlacklistHandler(blacklistService service.BlacklistService) *BlacklistHandler {
+	return &BlacklistHandler{blacklistService: blacklistService}
 }
 
 func (h *BlacklistHandler) Create(c *gin.Context) {

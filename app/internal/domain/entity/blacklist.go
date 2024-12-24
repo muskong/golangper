@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type blackapp struct {
+type Blacklist struct {
 	ID         uint   `gorm:"primarykey"`
 	Name       string `gorm:"type:varchar(50);index"`
 	Phone      string `gorm:"type:varchar(20);index"`

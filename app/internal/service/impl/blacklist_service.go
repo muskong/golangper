@@ -3,20 +3,24 @@ package impl
 import (
 	"context"
 
+	"blackapp/internal/domain/entity"
+	"blackapp/internal/domain/repository"
 	"blackapp/internal/service/dto"
 	"blackapp/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
-type blackappService struct {
-	repo repository.blackappRepository
+type BlacklistService struct {
+	repo repository.BlacklistRepository
 }
 
-func NewblackappService(repo repository.blackappRepository) *blackappService {
-	return &blackappService{repo: repo}
+func NewBlacklistService(repo repository.BlacklistRepository) *BlacklistService {
+	return &BlacklistService{repo: repo}
 }
 
-func (s *blackappService) Create(ctx context.Context, req *dto.CreateblackappDTO) error {
-	blackapp := &entity.blackapp{
+func (s *BlacklistService) Create(ctx context.Context, req *dto.CreateBlacklistDTO) error {
+	blacklist := &entity.Blacklist{
 		Name:       req.Name,
 		Phone:      req.Phone,
 		IDCard:     req.IDCard,
@@ -27,63 +31,63 @@ func (s *blackappService) Create(ctx context.Context, req *dto.CreateblackappDTO
 		MerchantID: req.MerchantID,
 	}
 
-	if err := s.repo.Create(ctx, blackapp); err != nil {
-		logger.Logger.Error("创建黑名单记录失败", err)
+	if err := s.repo.Create(ctx, blacklist); err != nil {
+		logger.Logger.Error("创建黑名单记录失败", zap.Error(err))
 		return err
 	}
 
 	return nil
 }
 
-func (s *blackappService) Update(ctx context.Context, req *dto.UpdateblackappDTO) error {
-	blackapp, err := s.repo.FindByID(ctx, req.ID)
+func (s *BlacklistService) Update(ctx context.Context, req *dto.UpdateBlacklistDTO) error {
+	blacklist, err := s.repo.FindByID(ctx, req.ID)
 	if err != nil {
 		return err
 	}
 
-	blackapp.Name = req.Name
-	blackapp.Phone = req.Phone
-	blackapp.IDCard = req.IDCard
-	blackapp.Email = req.Email
-	blackapp.Address = req.Address
-	blackapp.Remark = req.Remark
-	blackapp.Status = req.Status
+	blacklist.Name = req.Name
+	blacklist.Phone = req.Phone
+	blacklist.IDCard = req.IDCard
+	blacklist.Email = req.Email
+	blacklist.Address = req.Address
+	blacklist.Remark = req.Remark
+	blacklist.Status = req.Status
 
-	return s.repo.Update(ctx, blackapp)
+	return s.repo.Update(ctx, blacklist)
 }
 
-func (s *blackappService) Delete(ctx context.Context, id uint) error {
+func (s *BlacklistService) Delete(ctx context.Context, id uint) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *blackappService) GetByID(ctx context.Context, id uint) (*dto.blackappDTO, error) {
-	blackapp, err := s.repo.FindByID(ctx, id)
+func (s *BlacklistService) GetByID(ctx context.Context, id uint) (*dto.BlacklistDTO, error) {
+	blacklist, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return toblackappDTO(blackapp), nil
+	return toBlacklistDTO(blacklist), nil
 }
 
-func (s *blackappService) List(ctx context.Context, page, size int) ([]*dto.blackappDTO, int64, error) {
-	blackapps, total, err := s.repo.List(ctx, page, size)
+func (s *BlacklistService) List(ctx context.Context, page, size int) ([]*dto.BlacklistDTO, int64, error) {
+	blacklists, total, err := s.repo.List(ctx, page, size)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	dtos := make([]*dto.blackappDTO, len(blackapps))
-	for i, blackapp := range blackapps {
-		dtos[i] = toblackappDTO(blackapp)
+	dtos := make([]*dto.BlacklistDTO, len(blacklists))
+	for i, blacklist := range blacklists {
+		dtos[i] = toBlacklistDTO(blacklist)
 	}
 
 	return dtos, total, nil
 }
 
-func (s *blackappService) UpdateStatus(ctx context.Context, id uint, status int) error {
+func (s *BlacklistService) UpdateStatus(ctx context.Context, id uint, status int) error {
 	return s.repo.UpdateStatus(ctx, id, status)
 }
 
-func (s *blackappService) Check(ctx context.Context, req *dto.CheckblackappDTO) (bool, error) {
+func (s *BlacklistService) Check(ctx context.Context, req *dto.CheckBlacklistDTO) (bool, error) {
 	// 按照优先级依次检查手机号、身份证、姓名
 	if req.Phone != "" {
 		if _, err := s.repo.CheckByPhone(ctx, req.Phone); err == nil {
@@ -106,18 +110,18 @@ func (s *blackappService) Check(ctx context.Context, req *dto.CheckblackappDTO) 
 	return false, nil
 }
 
-func toblackappDTO(blackapp *entity.blackapp) *dto.blackappDTO {
-	return &dto.blackappDTO{
-		ID:         blackapp.ID,
-		Name:       blackapp.Name,
-		Phone:      blackapp.Phone,
-		IDCard:     blackapp.IDCard,
-		Email:      blackapp.Email,
-		Address:    blackapp.Address,
-		Remark:     blackapp.Remark,
-		Status:     blackapp.Status,
-		MerchantID: blackapp.MerchantID,
-		CreatedAt:  blackapp.CreatedAt,
-		UpdatedAt:  blackapp.UpdatedAt,
+func toBlacklistDTO(blacklist *entity.Blacklist) *dto.BlacklistDTO {
+	return &dto.BlacklistDTO{
+		ID:         blacklist.ID,
+		Name:       blacklist.Name,
+		Phone:      blacklist.Phone,
+		IDCard:     blacklist.IDCard,
+		Email:      blacklist.Email,
+		Address:    blacklist.Address,
+		Remark:     blacklist.Remark,
+		Status:     blacklist.Status,
+		MerchantID: blacklist.MerchantID,
+		CreatedAt:  blacklist.CreatedAt,
+		UpdatedAt:  blacklist.UpdatedAt,
 	}
 }

@@ -6,90 +6,91 @@ import (
 
 	"gorm.io/gorm"
 
+	"blackapp/internal/domain/entity"
 	"blackapp/pkg/database"
 )
 
-type blackappRepository struct{}
+type BlacklistRepository struct{}
 
-func NewblackappRepository() *blackappRepository {
-	return &blackappRepository{}
+func NewBlacklistRepository() *BlacklistRepository {
+	return &BlacklistRepository{}
 }
 
-func (r *blackappRepository) Create(ctx context.Context, blackapp *entity.blackapp) error {
-	return database.DB.Create(blackapp).Error
+func (r *BlacklistRepository) Create(ctx context.Context, blacklist *entity.Blacklist) error {
+	return database.DB.Create(blacklist).Error
 }
 
-func (r *blackappRepository) Update(ctx context.Context, blackapp *entity.blackapp) error {
-	return database.DB.Save(blackapp).Error
+func (r *BlacklistRepository) Update(ctx context.Context, blacklist *entity.Blacklist) error {
+	return database.DB.Save(blacklist).Error
 }
 
-func (r *blackappRepository) Delete(ctx context.Context, id uint) error {
-	return database.DB.Delete(&entity.blackapp{}, id).Error
+func (r *BlacklistRepository) Delete(ctx context.Context, id uint) error {
+	return database.DB.Delete(&entity.Blacklist{}, id).Error
 }
 
-func (r *blackappRepository) FindByID(ctx context.Context, id uint) (*entity.blackapp, error) {
-	var blackapp entity.blackapp
-	err := database.DB.First(&blackapp, id).Error
+func (r *BlacklistRepository) FindByID(ctx context.Context, id uint) (*entity.Blacklist, error) {
+	var blacklist entity.Blacklist
+	err := database.DB.First(&blacklist, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &blackapp, nil
+	return &blacklist, nil
 }
 
-func (r *blackappRepository) List(ctx context.Context, page, size int) ([]*entity.blackapp, int64, error) {
-	var blackapps []*entity.blackapp
+func (r *BlacklistRepository) List(ctx context.Context, page, size int) ([]*entity.Blacklist, int64, error) {
+	var blacklists []*entity.Blacklist
 	var total int64
 
 	offset := (page - 1) * size
 
-	err := database.DB.Model(&entity.blackapp{}).Count(&total).Error
+	err := database.DB.Model(&entity.Blacklist{}).Count(&total).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = database.DB.Offset(offset).Limit(size).Find(&blackapps).Error
-	return blackapps, total, err
+	err = database.DB.Offset(offset).Limit(size).Find(&blacklists).Error
+	return blacklists, total, err
 }
 
-func (r *blackappRepository) UpdateStatus(ctx context.Context, id uint, status int) error {
-	return database.DB.Model(&entity.blackapp{}).Where("id = ?", id).Update("status", status).Error
+func (r *BlacklistRepository) UpdateStatus(ctx context.Context, id uint, status int) error {
+	return database.DB.Model(&entity.Blacklist{}).Where("id = ?", id).Update("status", status).Error
 }
 
-func (r *blackappRepository) CheckByPhone(ctx context.Context, phone string) (*entity.blackapp, error) {
-	var blackapp entity.blackapp
-	err := database.DB.Where("phone = ? AND status = ?", phone, 1).First(&blackapp).Error
+func (r *BlacklistRepository) CheckByPhone(ctx context.Context, phone string) (*entity.Blacklist, error) {
+	var blacklist entity.Blacklist
+	err := database.DB.Where("phone = ? AND status = ?", phone, 1).First(&blacklist).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &blackapp, nil
+	return &blacklist, nil
 }
 
-func (r *blackappRepository) CheckByIDCard(ctx context.Context, idCard string) (*entity.blackapp, error) {
-	var blackapp entity.blackapp
-	err := database.DB.Where("id_card = ? AND status = ?", idCard, 1).First(&blackapp).Error
+func (r *BlacklistRepository) CheckByIDCard(ctx context.Context, idCard string) (*entity.Blacklist, error) {
+	var blacklist entity.Blacklist
+	err := database.DB.Where("id_card = ? AND status = ?", idCard, 1).First(&blacklist).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &blackapp, nil
+	return &blacklist, nil
 }
 
-func (r *blackappRepository) CheckByName(ctx context.Context, name string) (*entity.blackapp, error) {
-	var blackapp entity.blackapp
-	err := database.DB.Where("name = ? AND status = ?", name, 1).First(&blackapp).Error
+func (r *BlacklistRepository) CheckByName(ctx context.Context, name string) (*entity.Blacklist, error) {
+	var blacklist entity.Blacklist
+	err := database.DB.Where("name = ? AND status = ?", name, 1).First(&blacklist).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &blackapp, nil
+	return &blacklist, nil
 }

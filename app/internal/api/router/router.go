@@ -14,13 +14,13 @@ func InitRouter() *gin.Engine {
 
 	// 初始化依赖
 	merchantRepo := persistence.NewMerchantRepository()
-	blackappRepo := persistence.NewblackappRepository()
+	blacklistRepo := persistence.NewBlacklistRepository()
 
 	merchantService := impl.NewMerchantService(merchantRepo)
-	blackappService := impl.NewblackappService(blackappRepo)
+	blacklistService := impl.NewBlacklistService(blacklistRepo)
 
 	merchantHandler := handler.NewMerchantHandler(merchantService)
-	blackappHandler := handler.NewblackappHandler(blackappService)
+	blacklistHandler := handler.NewBlacklistHandler(blacklistService)
 
 	// 公开接口
 	public := r.Group("/api/v1")
@@ -44,16 +44,16 @@ func InitRouter() *gin.Engine {
 		}
 
 		// 黑名单管理
-		blackapps := authorized.Group("/blackapps")
-		blackapps.Use(middleware.RateLimit())
+		blacklists := authorized.Group("/blacklists")
+		blacklists.Use(middleware.RateLimit())
 		{
-			blackapps.POST("", blackappHandler.Create)
-			blackapps.PUT("/:id", blackappHandler.Update)
-			blackapps.DELETE("/:id", blackappHandler.Delete)
-			blackapps.GET("/:id", blackappHandler.GetByID)
-			blackapps.GET("", blackappHandler.List)
-			blackapps.PUT("/:id/status", blackappHandler.UpdateStatus)
-			blackapps.POST("/check", blackappHandler.Check)
+			blacklists.POST("", blacklistHandler.Create)
+			blacklists.PUT("/:id", blacklistHandler.Update)
+			blacklists.DELETE("/:id", blacklistHandler.Delete)
+			blacklists.GET("/:id", blacklistHandler.GetByID)
+			blacklists.GET("", blacklistHandler.List)
+			blacklists.PUT("/:id/status", blacklistHandler.UpdateStatus)
+			blacklists.POST("/check", blacklistHandler.Check)
 		}
 	}
 
