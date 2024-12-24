@@ -24,5 +24,5 @@ type AdminDTO struct {
 	Username  string `json:"username"`
 	Name      string `json:"name"`
 	Status    int    `json:"status"`
-	LastLogin string `json:"last_login"`
+	LastLogin string `json:"lastLogin"`
 }

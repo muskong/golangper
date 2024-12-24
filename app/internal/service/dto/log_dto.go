@@ -4,22 +4,22 @@ import "time"
 
 type LoginLogDTO struct {
 	ID        int       `json:"id"`
-	Type      int       `json:"type"` // 1:商户 2:管理员
-	UserID    int       `json:"user_id"`
+	Type      int       `json:"type"`
+	UserId    int       `json:"userId"`
 	IP        string    `json:"ip"`
-	UserAgent string    `json:"user_agent"`
-	Status    int       `json:"status"` // 1:成功 2:失败
-	CreatedAt time.Time `json:"created_at"`
+	UserAgent string    `json:"userAgent"`
+	Status    int       `json:"status"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type QueryLogDTO struct {
 	ID         int       `json:"id"`
-	MerchantID int       `json:"merchant_id"`
+	MerchantId int       `json:"merchantId"`
 	Phone      string    `json:"phone"`
-	IDCard     string    `json:"id_card"`
+	IdCard     string    `json:"idCard"`
 	Name       string    `json:"name"`
 	IP         string    `json:"ip"`
-	UserAgent  string    `json:"user_agent"`
+	UserAgent  string    `json:"userAgent"`
 	Exists     bool      `json:"exists"`
-	CreatedAt  time.Time `json:"created_at"`
+	CreatedAt  time.Time `json:"createdAt"`
 }
