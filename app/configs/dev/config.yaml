@@ -4,15 +4,16 @@ app:
   port: 8080
 
 database:
-  host: postgres
+  driver: postgres
+  host: 127.0.0.1
   port: 5432
-  user: postgres
-  password: postgres
+  user: blackuser
+  password: ZaX0VFi3BNfApBUuBQucTk7rI08plgIt
   dbname: blackapp
   sslmode: disable
 
 redis:
-  host: redis
+  host: 127.0.0.1
   port: 6379
   password: ""
   db: 0
@@ -23,3 +24,7 @@ log:
   maxage: 7
   maxbackups: 10
   level: debug
+
+jwt:
+  secret: 1234567890
+  token_expire: 24h  # 支持时间单位：h(小时)、m(分钟)、s(秒) 

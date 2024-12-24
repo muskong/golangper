@@ -12,7 +12,7 @@ type CreateMerchantDTO struct {
 }
 
 type UpdateMerchantDTO struct {
-	ID            uint   `json:"id" binding:"required"`
+	ID            int    `json:"id" binding:"required"`
 	Name          string `json:"name"`
 	Address       string `json:"address"`
 	ContactPerson string `json:"contact_person"`
@@ -22,7 +22,7 @@ type UpdateMerchantDTO struct {
 }
 
 type MerchantDTO struct {
-	ID              uint      `json:"id"`
+	ID              int       `json:"id"`
 	Name            string    `json:"name"`
 	Address         string    `json:"address"`
 	ContactPerson   string    `json:"contact_person"`

@@ -1,22 +1,31 @@
 package router
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 
 	"blackapp/internal/api/handler"
 	"blackapp/internal/api/middleware"
 	"blackapp/internal/infrastructure/persistence"
 	"blackapp/internal/service/impl"
+	"blackapp/pkg/config"
 )
 
 func InitRouter() *gin.Engine {
 	r := gin.Default()
 
+	jwtSecret := config.GetString("jwt.secret")
+	tokenExpire, err := time.ParseDuration(config.GetString("jwt.token_expire"))
+	if err != nil {
+		// 处理错误
+	}
+
 	// 初始化依赖
 	merchantRepo := persistence.NewMerchantRepository()
 	blacklistRepo := persistence.NewBlacklistRepository()
 
-	merchantService := impl.NewMerchantService(merchantRepo)
+	merchantService := impl.NewMerchantService(merchantRepo, jwtSecret, tokenExpire)
 	blacklistService := impl.NewBlacklistService(blacklistRepo)
 
 	merchantHandler := handler.NewMerchantHandler(merchantService)

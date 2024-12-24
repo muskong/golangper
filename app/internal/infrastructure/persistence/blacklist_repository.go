@@ -24,11 +24,11 @@ func (r *BlacklistRepository) Update(ctx context.Context, blacklist *entity.Blac
 	return database.DB.Save(blacklist).Error
 }
 
-func (r *BlacklistRepository) Delete(ctx context.Context, id uint) error {
+func (r *BlacklistRepository) Delete(ctx context.Context, id int) error {
 	return database.DB.Delete(&entity.Blacklist{}, id).Error
 }
 
-func (r *BlacklistRepository) FindByID(ctx context.Context, id uint) (*entity.Blacklist, error) {
+func (r *BlacklistRepository) FindByID(ctx context.Context, id int) (*entity.Blacklist, error) {
 	var blacklist entity.Blacklist
 	err := database.DB.First(&blacklist, id).Error
 	if err != nil {
@@ -55,7 +55,7 @@ func (r *BlacklistRepository) List(ctx context.Context, page, size int) ([]*enti
 	return blacklists, total, err
 }
 
-func (r *BlacklistRepository) UpdateStatus(ctx context.Context, id uint, status int) error {
+func (r *BlacklistRepository) UpdateStatus(ctx context.Context, id int, status int) error {
 	return database.DB.Model(&entity.Blacklist{}).Where("id = ?", id).Update("status", status).Error
 }
 

@@ -56,11 +56,11 @@ func (s *BlacklistService) Update(ctx context.Context, req *dto.UpdateBlacklistD
 	return s.repo.Update(ctx, blacklist)
 }
 
-func (s *BlacklistService) Delete(ctx context.Context, id uint) error {
+func (s *BlacklistService) Delete(ctx context.Context, id int) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *BlacklistService) GetByID(ctx context.Context, id uint) (*dto.BlacklistDTO, error) {
+func (s *BlacklistService) GetByID(ctx context.Context, id int) (*dto.BlacklistDTO, error) {
 	blacklist, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (s *BlacklistService) List(ctx context.Context, page, size int) ([]*dto.Bla
 	return dtos, total, nil
 }
 
-func (s *BlacklistService) UpdateStatus(ctx context.Context, id uint, status int) error {
+func (s *BlacklistService) UpdateStatus(ctx context.Context, id int, status int) error {
 	return s.repo.UpdateStatus(ctx, id, status)
 }
 

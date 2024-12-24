@@ -49,13 +49,13 @@ func (h *BlacklistHandler) Update(c *gin.Context) {
 }
 
 func (h *BlacklistHandler) Delete(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
 	}
 
-	if err := h.blacklistService.Delete(c.Request.Context(), uint(id)); err != nil {
+	if err := h.blacklistService.Delete(c.Request.Context(), int(id)); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -64,13 +64,13 @@ func (h *BlacklistHandler) Delete(c *gin.Context) {
 }
 
 func (h *BlacklistHandler) GetByID(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
 	}
 
-	blacklist, err := h.blacklistService.GetByID(c.Request.Context(), uint(id))
+	blacklist, err := h.blacklistService.GetByID(c.Request.Context(), int(id))
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -96,7 +96,7 @@ func (h *BlacklistHandler) List(c *gin.Context) {
 }
 
 func (h *BlacklistHandler) UpdateStatus(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
@@ -108,7 +108,7 @@ func (h *BlacklistHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.blacklistService.UpdateStatus(c.Request.Context(), uint(id), status); err != nil {
+	if err := h.blacklistService.UpdateStatus(c.Request.Context(), int(id), status); err != nil {
 		response.ServerError(c)
 		return
 	}

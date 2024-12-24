@@ -49,13 +49,13 @@ func (h *MerchantHandler) Update(c *gin.Context) {
 }
 
 func (h *MerchantHandler) Delete(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
 	}
 
-	if err := h.merchantService.Delete(c.Request.Context(), uint(id)); err != nil {
+	if err := h.merchantService.Delete(c.Request.Context(), int(id)); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -64,13 +64,13 @@ func (h *MerchantHandler) Delete(c *gin.Context) {
 }
 
 func (h *MerchantHandler) GetByID(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
 	}
 
-	merchant, err := h.merchantService.GetByID(c.Request.Context(), uint(id))
+	merchant, err := h.merchantService.GetByID(c.Request.Context(), int(id))
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -96,7 +96,7 @@ func (h *MerchantHandler) List(c *gin.Context) {
 }
 
 func (h *MerchantHandler) UpdateStatus(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "无效的ID")
 		return
@@ -108,7 +108,7 @@ func (h *MerchantHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.merchantService.UpdateStatus(c.Request.Context(), uint(id), status); err != nil {
+	if err := h.merchantService.UpdateStatus(c.Request.Context(), int(id), status); err != nil {
 		response.ServerError(c)
 		return
 	}

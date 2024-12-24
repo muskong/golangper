@@ -13,14 +13,21 @@ import (
 	"blackapp/pkg/logger"
 
 	"github.com/golang-jwt/jwt"
+	"go.uber.org/zap"
 )
 
 type merchantService struct {
-	repo repository.MerchantRepository
+	repo            repository.MerchantRepository
+	jwtSecret       string
+	tokenExpireTime time.Duration
 }
 
-func NewMerchantService(repo repository.MerchantRepository) *merchantService {
-	return &merchantService{repo: repo}
+func NewMerchantService(repo repository.MerchantRepository, jwtSecret string, tokenExpireTime time.Duration) *merchantService {
+	return &merchantService{
+		repo:            repo,
+		jwtSecret:       jwtSecret,
+		tokenExpireTime: tokenExpireTime,
+	}
 }
 
 func (s *merchantService) Create(ctx context.Context, req *dto.CreateMerchantDTO) error {
@@ -35,7 +42,7 @@ func (s *merchantService) Create(ctx context.Context, req *dto.CreateMerchantDTO
 	}
 
 	if err := s.repo.Create(ctx, merchant); err != nil {
-		logger.Logger.Error("创建商户失败", err)
+		logger.Logger.Error("创建商户失败", zap.Error(err))
 		return err
 	}
 
@@ -58,11 +65,11 @@ func (s *merchantService) Update(ctx context.Context, req *dto.UpdateMerchantDTO
 	return s.repo.Update(ctx, merchant)
 }
 
-func (s *merchantService) Delete(ctx context.Context, id uint) error {
+func (s *merchantService) Delete(ctx context.Context, id int) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *merchantService) GetByID(ctx context.Context, id uint) (*dto.MerchantDTO, error) {
+func (s *merchantService) GetByID(ctx context.Context, id int) (*dto.MerchantDTO, error) {
 	merchant, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -85,11 +92,11 @@ func (s *merchantService) List(ctx context.Context, page, size int) ([]*dto.Merc
 	return dtos, total, nil
 }
 
-func (s *merchantService) UpdateStatus(ctx context.Context, id uint, status int) error {
+func (s *merchantService) UpdateStatus(ctx context.Context, id int, status int) error {
 	return s.repo.UpdateStatus(ctx, id, status)
 }
 
-func (s *merchantService) GenerateAPICredentials(ctx context.Context, id uint) error {
+func (s *merchantService) GenerateAPICredentials(ctx context.Context, id int) error {
 	merchant, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return err
@@ -122,19 +129,20 @@ func (s *merchantService) Login(ctx context.Context, apiKey, apiSecret string) (
 		return "", fmt.Errorf("invalid credentials")
 	}
 
-	// 生成 JWT Token
+	// 使用配置的过期时间
+	expireTime := time.Now().Add(s.tokenExpireTime)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"merchant_id": merchant.ID,
-		"exp":         time.Now().Add(24 * time.Hour).Unix(),
+		"exp":         expireTime.Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte("your-secret-key"))
+	tokenString, err := token.SignedString([]byte(s.jwtSecret))
 	if err != nil {
 		return "", err
 	}
 
 	merchant.APIToken = tokenString
-	merchant.TokenExpireTime = time.Now().Add(24 * time.Hour)
+	merchant.TokenExpireTime = expireTime
 
 	if err := s.repo.UpdateToken(ctx, merchant.ID, tokenString, merchant.TokenExpireTime); err != nil {
 		return "", err

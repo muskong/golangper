@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Merchant struct {
-	ID              uint   `gorm:"primarykey"`
+	ID              int    `gorm:"primarykey"`
 	Name            string `gorm:"type:varchar(100);not null"`
 	Address         string `gorm:"type:varchar(255)"`
 	ContactPerson   string `gorm:"type:varchar(50)"`

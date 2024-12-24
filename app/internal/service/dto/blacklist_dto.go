@@ -9,11 +9,11 @@ type CreateBlacklistDTO struct {
 	Email      string `json:"email"`
 	Address    string `json:"address"`
 	Remark     string `json:"remark"`
-	MerchantID uint   `json:"merchant_id" binding:"required"`
+	MerchantID int    `json:"merchant_id" binding:"required"`
 }
 
 type UpdateBlacklistDTO struct {
-	ID      uint   `json:"id" binding:"required"`
+	ID      int    `json:"id" binding:"required"`
 	Name    string `json:"name"`
 	Phone   string `json:"phone"`
 	IDCard  string `json:"id_card"`
@@ -24,7 +24,7 @@ type UpdateBlacklistDTO struct {
 }
 
 type BlacklistDTO struct {
-	ID         uint      `json:"id"`
+	ID         int       `json:"id"`
 	Name       string    `json:"name"`
 	Phone      string    `json:"phone"`
 	IDCard     string    `json:"id_card"`
@@ -32,7 +32,7 @@ type BlacklistDTO struct {
 	Address    string    `json:"address"`
 	Remark     string    `json:"remark"`
 	Status     int       `json:"status"`
-	MerchantID uint      `json:"merchant_id"`
+	MerchantID int       `json:"merchant_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }

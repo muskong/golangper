@@ -42,7 +42,7 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		merchantID := uint(claims["merchant_id"].(float64))
+		merchantID := int(claims["merchant_id"].(float64))
 		c.Set("merchant_id", merchantID)
 		c.Next()
 	}
