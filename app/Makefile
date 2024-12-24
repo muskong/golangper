@@ -2,11 +2,13 @@
 
 # 构建应用
 build:
-	go build -o bin/blackapp ./cmd/server
+	go build -o bin/blackappClient ./cmd/client
+	go build -o bin/blackappServer ./cmd/server
 
 # 运行应用
 run:
 	go run ./cmd/server
+	go run ./cmd/client
 
 # 运行测试
 test:
@@ -22,11 +24,13 @@ clean:
 
 # 构建 Docker 镜像
 docker-build:
-	docker build -t blackapp .
+	docker build -t blackappClient .
+	docker build -t blackappServer .
 
 # 运行 Docker 容器
 docker-run:
-	docker-compose up
+	docker run -p 8080:8080 blackappServer
+	docker run -p 8081:8081 blackappClient
 
 # 停止 Docker 容器
 docker-stop:

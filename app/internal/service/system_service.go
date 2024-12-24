@@ -2,23 +2,24 @@ package service
 
 import (
 	"blackapp/internal/service/dto"
-	"context"
+
+	"github.com/gin-gonic/gin"
 )
 
 type SystemService interface {
 	// 系统监控
-	GetSystemMetrics(ctx context.Context) (*dto.SystemMetrics, error)
+	GetSystemMetrics(ctx *gin.Context) (*dto.SystemMetrics, error)
 
 	// 管理员管理
-	AdminLogin(ctx context.Context, req *dto.AdminLoginDTO) (string, error)
-	CreateAdmin(ctx context.Context, req *dto.CreateAdminDTO) error
-	UpdateAdmin(ctx context.Context, req *dto.UpdateAdminDTO) error
-	DeleteAdmin(ctx context.Context, id int) error
-	GetAdminByID(ctx context.Context, id int) (*dto.AdminDTO, error)
-	ListAdmins(ctx context.Context, page, size int) ([]*dto.AdminDTO, int64, error)
-	UpdateAdminStatus(ctx context.Context, id int, status int) error
+	AdminLogin(ctx *gin.Context, req *dto.AdminLoginDTO) (string, error)
+	CreateAdmin(ctx *gin.Context, req *dto.CreateAdminDTO) error
+	UpdateAdmin(ctx *gin.Context, req *dto.UpdateAdminDTO) error
+	DeleteAdmin(ctx *gin.Context, id int) error
+	GetAdminByID(ctx *gin.Context, id int) (*dto.AdminDTO, error)
+	ListAdmins(ctx *gin.Context, page, size int) ([]*dto.AdminDTO, int64, error)
+	UpdateAdminStatus(ctx *gin.Context, id int, status int) error
 
 	// 日志查询
-	ListLoginLogs(ctx context.Context, userType int, page, size int) ([]*dto.LoginLogDTO, int64, error)
-	ListQueryLogs(ctx context.Context, merchantID int, page, size int) ([]*dto.QueryLogDTO, int64, error)
+	ListLoginLogs(ctx *gin.Context, userType int, page, size int) ([]*dto.LoginLogDTO, int64, error)
+	ListQueryLogs(ctx *gin.Context, merchantID int, page, size int) ([]*dto.QueryLogDTO, int64, error)
 }

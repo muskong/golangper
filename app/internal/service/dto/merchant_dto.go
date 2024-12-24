@@ -37,3 +37,8 @@ type MerchantDTO struct {
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }
+
+type MerchantLoginDTO struct {
+	APIKey    string `json:"api_key"`
+	APISecret string `json:"api_secret"`
+}

@@ -1,25 +1,26 @@
 package impl
 
 import (
-	"context"
-
+	"blackapp/internal/domain/constants"
 	"blackapp/internal/domain/entity"
 	"blackapp/internal/domain/repository"
 	"blackapp/internal/service/dto"
 	"blackapp/pkg/logger"
 
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type BlacklistService struct {
-	repo repository.BlacklistRepository
+	repo         repository.BlacklistRepository
+	queryLogRepo repository.QueryLogRepository
 }
 
-func NewBlacklistService(repo repository.BlacklistRepository) *BlacklistService {
-	return &BlacklistService{repo: repo}
+func NewBlacklistService(repo repository.BlacklistRepository, queryLogRepo repository.QueryLogRepository) *BlacklistService {
+	return &BlacklistService{repo: repo, queryLogRepo: queryLogRepo}
 }
 
-func (s *BlacklistService) Create(ctx context.Context, req *dto.CreateBlacklistDTO) error {
+func (s *BlacklistService) Create(ctx *gin.Context, req *dto.CreateBlacklistDTO) error {
 	blacklist := &entity.Blacklist{
 		Name:    req.Name,
 		Phone:   req.Phone,
@@ -27,7 +28,7 @@ func (s *BlacklistService) Create(ctx context.Context, req *dto.CreateBlacklistD
 		Email:   req.Email,
 		Address: req.Address,
 		Remark:  req.Remark,
-		Status:  0, // 待审核状态
+		Status:  constants.BlacklistStatusPending, // 待审核状态
 	}
 
 	if err := s.repo.Create(ctx, blacklist); err != nil {
@@ -38,7 +39,7 @@ func (s *BlacklistService) Create(ctx context.Context, req *dto.CreateBlacklistD
 	return nil
 }
 
-func (s *BlacklistService) Update(ctx context.Context, req *dto.UpdateBlacklistDTO) error {
+func (s *BlacklistService) Update(ctx *gin.Context, req *dto.UpdateBlacklistDTO) error {
 	blacklist, err := s.repo.FindByID(ctx, req.ID)
 	if err != nil {
 		return err
@@ -55,22 +56,24 @@ func (s *BlacklistService) Update(ctx context.Context, req *dto.UpdateBlacklistD
 	return s.repo.Update(ctx, blacklist)
 }
 
-func (s *BlacklistService) Delete(ctx context.Context, id int) error {
+func (s *BlacklistService) Delete(ctx *gin.Context, id int) error {
 	return s.repo.Delete(ctx, id)
 }
 
-func (s *BlacklistService) GetByID(ctx context.Context, id int) (*dto.BlacklistDTO, error) {
+func (s *BlacklistService) GetByID(ctx *gin.Context, id int) (*dto.BlacklistDTO, error) {
 	blacklist, err := s.repo.FindByID(ctx, id)
 	if err != nil {
+		logger.Logger.Error("查询黑名单记录失败", zap.Int("id", id), zap.Error(err))
 		return nil, err
 	}
 
 	return toBlacklistDTO(blacklist), nil
 }
 
-func (s *BlacklistService) List(ctx context.Context, page, size int) ([]*dto.BlacklistDTO, int64, error) {
+func (s *BlacklistService) List(ctx *gin.Context, page, size int) ([]*dto.BlacklistDTO, int64, error) {
 	blacklists, total, err := s.repo.List(ctx, page, size)
 	if err != nil {
+		logger.Logger.Error("查询黑名单记录失败", zap.Int("page", page), zap.Int("size", size), zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -82,31 +85,47 @@ func (s *BlacklistService) List(ctx context.Context, page, size int) ([]*dto.Bla
 	return dtos, total, nil
 }
 
-func (s *BlacklistService) UpdateStatus(ctx context.Context, id int, status int) error {
+func (s *BlacklistService) UpdateStatus(ctx *gin.Context, id int, status int) error {
 	return s.repo.UpdateStatus(ctx, id, status)
 }
 
-func (s *BlacklistService) Check(ctx context.Context, req *dto.CheckBlacklistDTO) (bool, error) {
+func (s *BlacklistService) Check(ctx *gin.Context, req *dto.CheckBlacklistDTO) (bool, error) {
+	var err error
+	var exists bool
+
 	// 按照优先级依次检查手机号、身份证、姓名
 	if req.Phone != "" {
-		if _, err := s.repo.CheckByPhone(ctx, req.Phone); err == nil {
-			return true, nil
-		}
+		_, err = s.repo.CheckByPhone(ctx, req.Phone)
 	}
 
 	if req.IDCard != "" {
-		if _, err := s.repo.CheckByIDCard(ctx, req.IDCard); err == nil {
-			return true, nil
-		}
+		_, err = s.repo.CheckByIDCard(ctx, req.IDCard)
 	}
 
 	if req.Name != "" {
-		if _, err := s.repo.CheckByName(ctx, req.Name); err == nil {
-			return true, nil
-		}
+		_, err = s.repo.CheckByName(ctx, req.Name)
 	}
 
-	return false, nil
+	exists = err == nil
+
+	merchantID := ctx.GetInt("merchantID")
+	queryLog := &entity.QueryLog{
+		MerchantID: merchantID,
+		Phone:      req.Phone,
+		IDCard:     req.IDCard,
+		Name:       req.Name,
+		IP:         ctx.ClientIP(),
+		UserAgent:  ctx.Request.UserAgent(),
+		Exists:     exists,
+	}
+
+	if err := s.queryLogRepo.Create(ctx, queryLog); err != nil {
+		logger.Logger.Error("创建查询日志失败", zap.Error(err))
+		return false, err
+	}
+
+	logger.Logger.Info("黑名单检查结果", zap.Bool("exists", exists))
+	return exists, nil
 }
 
 func toBlacklistDTO(blacklist *entity.Blacklist) *dto.BlacklistDTO {

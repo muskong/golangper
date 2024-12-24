@@ -31,10 +31,12 @@ func InitClientRouter() *gin.Engine {
 
 	// 初始化依赖
 	merchantRepo := persistence.NewMerchantRepository()
+	loginLogRepo := persistence.NewLoginLogRepository()
 	blacklistRepo := persistence.NewBlacklistRepository()
+	queryLogRepo := persistence.NewQueryLogRepository()
 
-	merchantService := impl.NewMerchantService(merchantRepo, jwtSecret, tokenExpire)
-	blacklistService := impl.NewBlacklistService(blacklistRepo)
+	merchantService := impl.NewMerchantService(merchantRepo, loginLogRepo, jwtSecret, tokenExpire)
+	blacklistService := impl.NewBlacklistService(blacklistRepo, queryLogRepo)
 
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 	blacklistHandler := handler.NewBlacklistHandler(blacklistService)

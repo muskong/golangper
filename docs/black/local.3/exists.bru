@@ -4,16 +4,18 @@ meta {
   seq: 6
 }
 
-get {
-  url: http://localhost:8080/api/v1/blacklist/exists?phone=18473044267
-  body: none
+post {
+  url: http://localhost:8080/api/v1/blacklists/check
+  body: json
   auth: bearer
 }
 
-query {
-  phone: 18473044267
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzUxMDU1MzYsIm1lcmNoYW50SUQiOjF9.9shOcmHUZzuKzT4r058QMRH6eBengVSLF9jTSCRQNt8
 }
 
-auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNZXJjaGFudElEIjoyLCJleHAiOjE3MzQ3NTI4MzUsImlhdCI6MTczNDY2NjQzNX0.mlc9OrdZxCIe0F9f68xX9sWT3xdS7tJ-IDhjaAIVAr4
+body:json {
+  {
+    "phone":"15054683318"
+  }
 }

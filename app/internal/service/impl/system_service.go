@@ -1,21 +1,22 @@
 package impl
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"go.uber.org/zap"
 
+	"blackapp/internal/api/middleware"
+	"blackapp/internal/domain/constants"
 	"blackapp/internal/domain/entity"
 	"blackapp/internal/domain/repository"
 	"blackapp/internal/service/dto"
 	"blackapp/pkg/logger"
 	"blackapp/pkg/monitor"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
@@ -50,12 +51,13 @@ func NewSystemService(
 	}
 }
 
-func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetrics, error) {
+func (s *systemService) GetSystemMetrics(ctx *gin.Context) (*dto.SystemMetrics, error) {
 	metrics := &dto.SystemMetrics{}
 
 	// 获取CPU信息
 	cpuInfo, err := monitor.GetCPUInfo()
 	if err != nil {
+		logger.Logger.Error("获取CPU信息失败", zap.Error(err))
 		return nil, err
 	}
 	metrics.CPU = *cpuInfo
@@ -63,6 +65,7 @@ func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetric
 	// 获取内存信息
 	memInfo, err := monitor.GetMemoryInfo()
 	if err != nil {
+		logger.Logger.Error("获取内存信息失败", zap.Error(err))
 		return nil, err
 	}
 	metrics.Memory = *memInfo
@@ -70,6 +73,7 @@ func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetric
 	// 获取Redis信息
 	redisInfo, err := monitor.GetRedisInfo(s.rdb)
 	if err != nil {
+		logger.Logger.Error("获取Redis信息失败", zap.Error(err))
 		return nil, err
 	}
 	metrics.Redis = *redisInfo
@@ -77,6 +81,7 @@ func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetric
 	// 获取PostgreSQL信息
 	pgInfo, err := monitor.GetPostgresInfo(s.db)
 	if err != nil {
+		logger.Logger.Error("获取PostgreSQL信息失败", zap.Error(err))
 		return nil, err
 	}
 	metrics.Postgres = *pgInfo
@@ -84,25 +89,21 @@ func (s *systemService) GetSystemMetrics(ctx context.Context) (*dto.SystemMetric
 	return metrics, nil
 }
 
-func (s *systemService) AdminLogin(ctx context.Context, req *dto.AdminLoginDTO) (string, error) {
+func (s *systemService) AdminLogin(ctx *gin.Context, req *dto.AdminLoginDTO) (string, error) {
 	admin, err := s.adminRepo.FindByUsername(ctx, req.Username)
 	if err != nil {
+		logger.Logger.Error("查询管理员失败", zap.String("username", req.Username), zap.Error(err))
 		return "", err
 	}
 
 	if admin == nil || admin.Password != hashPassword(req.Password) {
+		logger.Logger.Error("管理员登录失败", zap.String("username", req.Username), zap.String("password", req.Password))
 		return "", fmt.Errorf("invalid credentials")
 	}
 
-	// 生成JWT Token
-	expireTime := time.Now().Add(s.tokenExpire)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"admin_id": admin.ID,
-		"exp":      expireTime.Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(s.jwtSecret))
+	tokenString, err := middleware.GenerateToken(admin.ID)
 	if err != nil {
+		logger.Logger.Error("生成管理员token失败", zap.Error(err))
 		return "", err
 	}
 
@@ -115,21 +116,22 @@ func (s *systemService) AdminLogin(ctx context.Context, req *dto.AdminLoginDTO) 
 	return tokenString, nil
 }
 
-func (s *systemService) CreateAdmin(ctx context.Context, req *dto.CreateAdminDTO) error {
+func (s *systemService) CreateAdmin(ctx *gin.Context, req *dto.CreateAdminDTO) error {
 	admin := &entity.Admin{
 		Username:  req.Username,
 		Password:  hashPassword(req.Password),
 		Name:      req.Name,
-		Status:    1,
+		Status:    constants.StatusEnabled,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 	return s.adminRepo.Create(ctx, admin)
 }
 
-func (s *systemService) UpdateAdmin(ctx context.Context, req *dto.UpdateAdminDTO) error {
+func (s *systemService) UpdateAdmin(ctx *gin.Context, req *dto.UpdateAdminDTO) error {
 	admin, err := s.adminRepo.FindByID(ctx, req.ID)
 	if err != nil {
+		logger.Logger.Error("查询管理员失败", zap.Int("id", req.ID), zap.Error(err))
 		return err
 	}
 
@@ -144,21 +146,23 @@ func (s *systemService) UpdateAdmin(ctx context.Context, req *dto.UpdateAdminDTO
 	return s.adminRepo.Update(ctx, admin)
 }
 
-func (s *systemService) DeleteAdmin(ctx context.Context, id int) error {
+func (s *systemService) DeleteAdmin(ctx *gin.Context, id int) error {
 	return s.adminRepo.Delete(ctx, id)
 }
 
-func (s *systemService) GetAdminByID(ctx context.Context, id int) (*dto.AdminDTO, error) {
+func (s *systemService) GetAdminByID(ctx *gin.Context, id int) (*dto.AdminDTO, error) {
 	admin, err := s.adminRepo.FindByID(ctx, id)
 	if err != nil {
+		logger.Logger.Error("查询管理员失败", zap.Int("id", id), zap.Error(err))
 		return nil, err
 	}
 	return toAdminDTO(admin), nil
 }
 
-func (s *systemService) ListAdmins(ctx context.Context, page, size int) ([]*dto.AdminDTO, int64, error) {
+func (s *systemService) ListAdmins(ctx *gin.Context, page, size int) ([]*dto.AdminDTO, int64, error) {
 	admins, total, err := s.adminRepo.List(ctx, page, size)
 	if err != nil {
+		logger.Logger.Error("查询管理员失败", zap.Int("page", page), zap.Int("size", size), zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -169,13 +173,14 @@ func (s *systemService) ListAdmins(ctx context.Context, page, size int) ([]*dto.
 	return dtos, total, nil
 }
 
-func (s *systemService) UpdateAdminStatus(ctx context.Context, id int, status int) error {
+func (s *systemService) UpdateAdminStatus(ctx *gin.Context, id int, status int) error {
 	return s.adminRepo.UpdateStatus(ctx, id, status)
 }
 
-func (s *systemService) ListLoginLogs(ctx context.Context, userType int, page, size int) ([]*dto.LoginLogDTO, int64, error) {
+func (s *systemService) ListLoginLogs(ctx *gin.Context, userType int, page, size int) ([]*dto.LoginLogDTO, int64, error) {
 	logs, total, err := s.loginLogRepo.List(ctx, userType, page, size)
 	if err != nil {
+		logger.Logger.Error("查询登录日志失败", zap.Int("userType", userType), zap.Int("page", page), zap.Int("size", size), zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -186,9 +191,10 @@ func (s *systemService) ListLoginLogs(ctx context.Context, userType int, page, s
 	return dtos, total, nil
 }
 
-func (s *systemService) ListQueryLogs(ctx context.Context, merchantID int, page, size int) ([]*dto.QueryLogDTO, int64, error) {
+func (s *systemService) ListQueryLogs(ctx *gin.Context, merchantID int, page, size int) ([]*dto.QueryLogDTO, int64, error) {
 	logs, total, err := s.queryLogRepo.List(ctx, merchantID, page, size)
 	if err != nil {
+		logger.Logger.Error("查询查询日志失败", zap.Int("merchantID", merchantID), zap.Int("page", page), zap.Int("size", size), zap.Error(err))
 		return nil, 0, err
 	}
 

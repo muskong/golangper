@@ -25,7 +25,7 @@ func (h *MerchantHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.merchantService.Create(c.Request.Context(), &req); err != nil {
+	if err := h.merchantService.Create(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -40,7 +40,7 @@ func (h *MerchantHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.merchantService.Update(c.Request.Context(), &req); err != nil {
+	if err := h.merchantService.Update(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -55,7 +55,7 @@ func (h *MerchantHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.merchantService.Delete(c.Request.Context(), int(id)); err != nil {
+	if err := h.merchantService.Delete(c, int(id)); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -70,7 +70,7 @@ func (h *MerchantHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	merchant, err := h.merchantService.GetByID(c.Request.Context(), int(id))
+	merchant, err := h.merchantService.GetByID(c, int(id))
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -83,7 +83,7 @@ func (h *MerchantHandler) List(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
 
-	merchants, total, err := h.merchantService.List(c.Request.Context(), page, size)
+	merchants, total, err := h.merchantService.List(c, page, size)
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -108,7 +108,7 @@ func (h *MerchantHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.merchantService.UpdateStatus(c.Request.Context(), int(id), status); err != nil {
+	if err := h.merchantService.UpdateStatus(c, int(id), status); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -117,15 +117,18 @@ func (h *MerchantHandler) UpdateStatus(c *gin.Context) {
 }
 
 func (h *MerchantHandler) Login(c *gin.Context) {
-	apiKey := c.PostForm("api_key")
-	apiSecret := c.PostForm("api_secret")
+	var req dto.MerchantLoginDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "无效的请求参数")
+		return
+	}
 
-	if apiKey == "" || apiSecret == "" {
+	if req.APIKey == "" || req.APISecret == "" {
 		response.BadRequest(c, "API Key和Secret不能为空")
 		return
 	}
 
-	token, err := h.merchantService.Login(c.Request.Context(), apiKey, apiSecret)
+	token, err := h.merchantService.Login(c, &req)
 	if err != nil {
 		response.Error(c, 401, "认证失败")
 		return

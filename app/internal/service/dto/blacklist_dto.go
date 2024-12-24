@@ -36,7 +36,8 @@ type BlacklistDTO struct {
 }
 
 type CheckBlacklistDTO struct {
-	Name   string `json:"name"`
-	Phone  string `json:"phone"`
-	IDCard string `json:"idCard"`
+	MerchantID int    `json:"merchantID"`
+	Name       string `json:"name"`
+	Phone      string `json:"phone"`
+	IDCard     string `json:"idCard"`
 }

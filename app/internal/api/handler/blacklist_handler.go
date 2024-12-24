@@ -25,7 +25,7 @@ func (h *BlacklistHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.blacklistService.Create(c.Request.Context(), &req); err != nil {
+	if err := h.blacklistService.Create(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -40,7 +40,7 @@ func (h *BlacklistHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.blacklistService.Update(c.Request.Context(), &req); err != nil {
+	if err := h.blacklistService.Update(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -55,7 +55,7 @@ func (h *BlacklistHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.blacklistService.Delete(c.Request.Context(), int(id)); err != nil {
+	if err := h.blacklistService.Delete(c, int(id)); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -70,7 +70,7 @@ func (h *BlacklistHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	blacklist, err := h.blacklistService.GetByID(c.Request.Context(), int(id))
+	blacklist, err := h.blacklistService.GetByID(c, int(id))
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -83,7 +83,7 @@ func (h *BlacklistHandler) List(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
 
-	blacklists, total, err := h.blacklistService.List(c.Request.Context(), page, size)
+	blacklists, total, err := h.blacklistService.List(c, page, size)
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -108,7 +108,7 @@ func (h *BlacklistHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.blacklistService.UpdateStatus(c.Request.Context(), int(id), status); err != nil {
+	if err := h.blacklistService.UpdateStatus(c, int(id), status); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -123,7 +123,7 @@ func (h *BlacklistHandler) Check(c *gin.Context) {
 		return
 	}
 
-	exists, err := h.blacklistService.Check(c.Request.Context(), &req)
+	exists, err := h.blacklistService.Check(c, &req)
 	if err != nil {
 		response.ServerError(c)
 		return

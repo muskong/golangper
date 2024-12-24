@@ -1,3 +1,4 @@
 
 cmd/build/blackusers
 go.sum
+/app/bin

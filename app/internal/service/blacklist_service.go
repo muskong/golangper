@@ -2,15 +2,16 @@ package service
 
 import (
 	"blackapp/internal/service/dto"
-	"context"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BlacklistService interface {
-	Create(ctx context.Context, req *dto.CreateBlacklistDTO) error
-	Update(ctx context.Context, req *dto.UpdateBlacklistDTO) error
-	Delete(ctx context.Context, id int) error
-	GetByID(ctx context.Context, id int) (*dto.BlacklistDTO, error)
-	List(ctx context.Context, page, size int) ([]*dto.BlacklistDTO, int64, error)
-	UpdateStatus(ctx context.Context, id int, status int) error
-	Check(ctx context.Context, req *dto.CheckBlacklistDTO) (bool, error)
+	Create(ctx *gin.Context, req *dto.CreateBlacklistDTO) error
+	Update(ctx *gin.Context, req *dto.UpdateBlacklistDTO) error
+	Delete(ctx *gin.Context, id int) error
+	GetByID(ctx *gin.Context, id int) (*dto.BlacklistDTO, error)
+	List(ctx *gin.Context, page, size int) ([]*dto.BlacklistDTO, int64, error)
+	UpdateStatus(ctx *gin.Context, id int, status int) error
+	Check(ctx *gin.Context, req *dto.CheckBlacklistDTO) (bool, error)
 }

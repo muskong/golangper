@@ -48,8 +48,8 @@ func InitRouter() *gin.Engine {
 		database.DB,
 	)
 
-	merchantService := impl.NewMerchantService(merchantRepo, jwtSecret, tokenExpire)
-	blacklistService := impl.NewBlacklistService(blacklistRepo)
+	merchantService := impl.NewMerchantService(merchantRepo, loginLogRepo, jwtSecret, tokenExpire)
+	blacklistService := impl.NewBlacklistService(blacklistRepo, queryLogRepo)
 
 	merchantHandler := handler.NewMerchantHandler(merchantService)
 	blacklistHandler := handler.NewBlacklistHandler(blacklistService)
@@ -58,7 +58,6 @@ func InitRouter() *gin.Engine {
 	// 公开接口
 	public := app.Group("/api/v1")
 	{
-		public.POST("/merchants/login", merchantHandler.Login)
 		public.POST("/admins/login", systemHandler.AdminLogin)
 	}
 
@@ -87,7 +86,6 @@ func InitRouter() *gin.Engine {
 			blacklists.GET("/:id", blacklistHandler.GetByID)
 			blacklists.GET("", blacklistHandler.List)
 			blacklists.PUT("/:id/status", blacklistHandler.UpdateStatus)
-			blacklists.POST("/check", blacklistHandler.Check)
 		}
 
 		// 系统监控

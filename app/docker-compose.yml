@@ -1,10 +1,22 @@
 version: '3'
 
 services:
-  app:
-    build: .
+  appServer:
+    build: ./cmd/server
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - CONFIG_PATH=/app/configs/dev
+    volumes:
+      - ./logs:/app/logs
+
+  appClient:
+    build: ./cmd/client
+    ports:
+      - "8081:8081"
     depends_on:
       - postgres
       - redis

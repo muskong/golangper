@@ -2,17 +2,18 @@ package repository
 
 import (
 	"blackapp/internal/domain/entity"
-	"context"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type MerchantRepository interface {
-	Create(ctx context.Context, merchant *entity.Merchant) error
-	Update(ctx context.Context, merchant *entity.Merchant) error
-	Delete(ctx context.Context, id int) error
-	FindByID(ctx context.Context, id int) (*entity.Merchant, error)
-	FindByAPIKey(ctx context.Context, apiKey string) (*entity.Merchant, error)
-	List(ctx context.Context, page, size int) ([]*entity.Merchant, int64, error)
-	UpdateStatus(ctx context.Context, id int, status int) error
-	UpdateToken(ctx context.Context, id int, token string, expireTime time.Time) error
+	Create(ctx *gin.Context, merchant *entity.Merchant) error
+	Update(ctx *gin.Context, merchant *entity.Merchant) error
+	Delete(ctx *gin.Context, id int) error
+	FindByID(ctx *gin.Context, id int) (*entity.Merchant, error)
+	FindByAPIKey(ctx *gin.Context, apiKey string) (*entity.Merchant, error)
+	List(ctx *gin.Context, page, size int) ([]*entity.Merchant, int64, error)
+	UpdateStatus(ctx *gin.Context, id int, status int) error
+	UpdateToken(ctx *gin.Context, id int, token string, expireTime time.Time) error
 }

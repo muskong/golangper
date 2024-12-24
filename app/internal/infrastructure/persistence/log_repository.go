@@ -1,10 +1,10 @@
 package persistence
 
 import (
-	"context"
-
 	"blackapp/internal/domain/entity"
 	"blackapp/pkg/database"
+
+	"github.com/gin-gonic/gin"
 )
 
 type LoginLogRepository struct{}
@@ -13,11 +13,11 @@ func NewLoginLogRepository() *LoginLogRepository {
 	return &LoginLogRepository{}
 }
 
-func (r *LoginLogRepository) Create(ctx context.Context, log *entity.LoginLog) error {
+func (r *LoginLogRepository) Create(ctx *gin.Context, log *entity.LoginLog) error {
 	return database.DB.Create(log).Error
 }
 
-func (r *LoginLogRepository) List(ctx context.Context, userType int, page, size int) ([]*entity.LoginLog, int64, error) {
+func (r *LoginLogRepository) List(ctx *gin.Context, userType int, page, size int) ([]*entity.LoginLog, int64, error) {
 	var logs []*entity.LoginLog
 	var total int64
 
@@ -46,11 +46,11 @@ func NewQueryLogRepository() *QueryLogRepository {
 	return &QueryLogRepository{}
 }
 
-func (r *QueryLogRepository) Create(ctx context.Context, log *entity.QueryLog) error {
+func (r *QueryLogRepository) Create(ctx *gin.Context, log *entity.QueryLog) error {
 	return database.DB.Create(log).Error
 }
 
-func (r *QueryLogRepository) List(ctx context.Context, merchantID int, page, size int) ([]*entity.QueryLog, int64, error) {
+func (r *QueryLogRepository) List(ctx *gin.Context, merchantID int, page, size int) ([]*entity.QueryLog, int64, error) {
 	var logs []*entity.QueryLog
 	var total int64
 

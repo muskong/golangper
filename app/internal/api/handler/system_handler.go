@@ -25,7 +25,7 @@ func NewSystemHandler(systemService service.SystemService) *SystemHandler {
 // @Success 200 {object} dto.SystemMetrics
 // @Router /system/metrics [get]
 func (h *SystemHandler) GetSystemMetrics(c *gin.Context) {
-	metrics, err := h.systemService.GetSystemMetrics(c.Request.Context())
+	metrics, err := h.systemService.GetSystemMetrics(c)
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -48,7 +48,7 @@ func (h *SystemHandler) AdminLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := h.systemService.AdminLogin(c.Request.Context(), &req)
+	token, err := h.systemService.AdminLogin(c, &req)
 	if err != nil {
 		response.Error(c, 401, "认证失败")
 		return
@@ -65,7 +65,7 @@ func (h *SystemHandler) CreateAdmin(c *gin.Context) {
 		return
 	}
 
-	if err := h.systemService.CreateAdmin(c.Request.Context(), &req); err != nil {
+	if err := h.systemService.CreateAdmin(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -81,7 +81,7 @@ func (h *SystemHandler) UpdateAdmin(c *gin.Context) {
 		return
 	}
 
-	if err := h.systemService.UpdateAdmin(c.Request.Context(), &req); err != nil {
+	if err := h.systemService.UpdateAdmin(c, &req); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -94,7 +94,7 @@ func (h *SystemHandler) ListAdmins(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
 
-	admins, total, err := h.systemService.ListAdmins(c.Request.Context(), page, size)
+	admins, total, err := h.systemService.ListAdmins(c, page, size)
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -120,7 +120,7 @@ func (h *SystemHandler) UpdateAdminStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.systemService.UpdateAdminStatus(c.Request.Context(), int(id), status); err != nil {
+	if err := h.systemService.UpdateAdminStatus(c, int(id), status); err != nil {
 		response.ServerError(c)
 		return
 	}
@@ -134,7 +134,7 @@ func (h *SystemHandler) ListLoginLogs(c *gin.Context) {
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
 	userType, _ := strconv.Atoi(c.DefaultQuery("type", "0"))
 
-	logs, total, err := h.systemService.ListLoginLogs(c.Request.Context(), userType, page, size)
+	logs, total, err := h.systemService.ListLoginLogs(c, userType, page, size)
 	if err != nil {
 		response.ServerError(c)
 		return
@@ -150,9 +150,9 @@ func (h *SystemHandler) ListLoginLogs(c *gin.Context) {
 func (h *SystemHandler) ListQueryLogs(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
-	merchantID, _ := strconv.ParseInt(c.DefaultQuery("merchant_id", "0"), 10, 64)
+	merchantID, _ := strconv.ParseInt(c.DefaultQuery("merchantID", "0"), 10, 64)
 
-	logs, total, err := h.systemService.ListQueryLogs(c.Request.Context(), int(merchantID), page, size)
+	logs, total, err := h.systemService.ListQueryLogs(c, int(merchantID), page, size)
 	if err != nil {
 		response.ServerError(c)
 		return

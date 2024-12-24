@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"errors"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 
 	"blackapp/internal/api/response"
 	"blackapp/pkg/config"
@@ -26,25 +28,51 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
-			return []byte(config.GetString("jwt.secret")), nil
-		})
-
-		if err != nil || !token.Valid {
+		// 验证token
+		claims, err := parseToken(parts[1])
+		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			response.Unauthorized(c)
-			c.Abort()
-			return
-		}
-
-		merchantID := int(claims["merchant_id"].(float64))
-		c.Set("merchant_id", merchantID)
+		// 将用户信息存储到上下文
+		c.Set("merchantID", claims.MerchantID)
 		c.Next()
 	}
+}
+
+type Claims struct {
+	MerchantID int `json:"merchantID"`
+	jwt.RegisteredClaims
+}
+
+func GenerateToken(merchantID int) (string, error) {
+	claims := Claims{
+		MerchantID: merchantID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(config.GetString("jwt.secret")))
+}
+
+func parseToken(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.GetString("jwt.secret")), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	}
+
+	return nil, errors.New("invalid token")
 }

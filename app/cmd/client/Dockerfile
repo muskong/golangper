@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # 构建应用
-RUN CGO_ENABLED=0 GOOS=linux go build -o blackapp ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/blackappClient ./cmd/client
 
 # 运行阶段
 FROM alpine:latest
@@ -19,7 +19,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # 从构建阶段复制二进制文件
-COPY --from=builder /app/blackapp .
+COPY --from=builder /app/bin/blackappClient .
 COPY --from=builder /app/configs ./configs
 
 # 创建日志目录
@@ -29,4 +29,4 @@ RUN mkdir -p /app/logs
 EXPOSE 8080
 
 # 运行应用
-CMD ["./blackapp"] 
+CMD ["./bin/blackappClient"] 
