@@ -15,7 +15,7 @@ import (
 )
 
 func InitRouter() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(config.GetString("app.mode"))
 	app := gin.New()
 	// 注册中间件
 	app.Use(gin.Logger())

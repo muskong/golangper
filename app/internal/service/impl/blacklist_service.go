@@ -21,14 +21,13 @@ func NewBlacklistService(repo repository.BlacklistRepository) *BlacklistService 
 
 func (s *BlacklistService) Create(ctx context.Context, req *dto.CreateBlacklistDTO) error {
 	blacklist := &entity.Blacklist{
-		Name:       req.Name,
-		Phone:      req.Phone,
-		IDCard:     req.IDCard,
-		Email:      req.Email,
-		Address:    req.Address,
-		Remark:     req.Remark,
-		Status:     0, // 待审核状态
-		MerchantID: req.MerchantID,
+		Name:    req.Name,
+		Phone:   req.Phone,
+		IDCard:  req.IDCard,
+		Email:   req.Email,
+		Address: req.Address,
+		Remark:  req.Remark,
+		Status:  0, // 待审核状态
 	}
 
 	if err := s.repo.Create(ctx, blacklist); err != nil {
@@ -112,16 +111,15 @@ func (s *BlacklistService) Check(ctx context.Context, req *dto.CheckBlacklistDTO
 
 func toBlacklistDTO(blacklist *entity.Blacklist) *dto.BlacklistDTO {
 	return &dto.BlacklistDTO{
-		ID:         blacklist.ID,
-		Name:       blacklist.Name,
-		Phone:      blacklist.Phone,
-		IDCard:     blacklist.IDCard,
-		Email:      blacklist.Email,
-		Address:    blacklist.Address,
-		Remark:     blacklist.Remark,
-		Status:     blacklist.Status,
-		MerchantID: blacklist.MerchantID,
-		CreatedAt:  blacklist.CreatedAt,
-		UpdatedAt:  blacklist.UpdatedAt,
+		ID:        blacklist.ID,
+		Name:      blacklist.Name,
+		Phone:     blacklist.Phone,
+		IDCard:    blacklist.IDCard,
+		Email:     blacklist.Email,
+		Address:   blacklist.Address,
+		Remark:    blacklist.Remark,
+		Status:    blacklist.Status,
+		CreatedAt: blacklist.CreatedAt,
+		UpdatedAt: blacklist.UpdatedAt,
 	}
 }

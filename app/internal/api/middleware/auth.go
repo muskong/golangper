@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 
 	"blackapp/internal/api/response"
+	"blackapp/pkg/config"
 )
 
 func JWTAuth() gin.HandlerFunc {
@@ -26,7 +27,7 @@ func JWTAuth() gin.HandlerFunc {
 		}
 
 		token, err := jwt.Parse(parts[1], func(token *jwt.Token) (interface{}, error) {
-			return []byte("your-secret-key"), nil
+			return []byte(config.GetString("jwt.secret")), nil
 		})
 
 		if err != nil || !token.Valid {

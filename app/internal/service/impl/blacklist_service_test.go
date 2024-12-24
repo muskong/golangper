@@ -78,10 +78,9 @@ func TestBlacklistService_Create(t *testing.T) {
 
 	ctx := context.Background()
 	req := &dto.CreateBlacklistDTO{
-		Name:       "Test User",
-		Phone:      "12345678901",
-		IDCard:     "123456789012345678",
-		MerchantID: 1,
+		Name:   "Test User",
+		Phone:  "12345678901",
+		IDCard: "123456789012345678",
 	}
 
 	mockRepo.On("Create", ctx, mock.AnythingOfType("*entity.Blacklist")).Return(nil)

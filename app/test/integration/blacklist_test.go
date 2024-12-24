@@ -16,10 +16,9 @@ func TestBlacklistAPI_Create(t *testing.T) {
 	r := setupTestRouter(t)
 
 	blacklist := dto.CreateBlacklistDTO{
-		Name:       "Test User",
-		Phone:      "12345678901",
-		IDCard:     "123456789012345678",
-		MerchantID: 1,
+		Name:   "Test User",
+		Phone:  "12345678901",
+		IDCard: "123456789012345678",
 	}
 
 	body, _ := json.Marshal(blacklist)
