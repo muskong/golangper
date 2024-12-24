@@ -59,6 +59,7 @@ func InitRouter() *gin.Engine {
 	public := app.Group("/api/v1")
 	{
 		public.POST("/merchants/login", merchantHandler.Login)
+		public.POST("/admins/login", systemHandler.AdminLogin)
 	}
 
 	// 需要认证的接口
@@ -95,7 +96,6 @@ func InitRouter() *gin.Engine {
 		// 管理员管理
 		admins := authorized.Group("/admins")
 		{
-			admins.POST("/login", systemHandler.AdminLogin)
 			admins.POST("", systemHandler.CreateAdmin)
 			admins.PUT("/:id", systemHandler.UpdateAdmin)
 			admins.GET("", systemHandler.ListAdmins)
