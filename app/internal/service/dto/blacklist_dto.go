@@ -5,7 +5,7 @@ import "time"
 type CreateBlacklistDTO struct {
 	Name    string `json:"name" binding:"required"`
 	Phone   string `json:"phone" binding:"required"`
-	IdCard  string `json:"idCard" binding:"required"`
+	IDCard  string `json:"idCard" binding:"required"`
 	Email   string `json:"email"`
 	Address string `json:"address"`
 	Remark  string `json:"remark"`
@@ -15,7 +15,7 @@ type UpdateBlacklistDTO struct {
 	ID      int    `json:"id" binding:"required"`
 	Name    string `json:"name"`
 	Phone   string `json:"phone"`
-	IdCard  string `json:"idCard"`
+	IDCard  string `json:"idCard"`
 	Email   string `json:"email"`
 	Address string `json:"address"`
 	Remark  string `json:"remark"`
@@ -26,7 +26,7 @@ type BlacklistDTO struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	Phone     string    `json:"phone"`
-	IdCard    string    `json:"idCard"`
+	IDCard    string    `json:"idCard"`
 	Email     string    `json:"email"`
 	Address   string    `json:"address"`
 	Remark    string    `json:"remark"`
@@ -38,5 +38,5 @@ type BlacklistDTO struct {
 type CheckBlacklistDTO struct {
 	Name   string `json:"name"`
 	Phone  string `json:"phone"`
-	IdCard string `json:"idCard"`
+	IDCard string `json:"idCard"`
 }

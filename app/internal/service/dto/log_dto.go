@@ -5,7 +5,7 @@ import "time"
 type LoginLogDTO struct {
 	ID        int       `json:"id"`
 	Type      int       `json:"type"`
-	UserId    int       `json:"userId"`
+	UserID    int       `json:"userId"`
 	IP        string    `json:"ip"`
 	UserAgent string    `json:"userAgent"`
 	Status    int       `json:"status"`
@@ -14,9 +14,9 @@ type LoginLogDTO struct {
 
 type QueryLogDTO struct {
 	ID         int       `json:"id"`
-	MerchantId int       `json:"merchantId"`
+	MerchantID int       `json:"merchantId"`
 	Phone      string    `json:"phone"`
-	IdCard     string    `json:"idCard"`
+	IDCard     string    `json:"idCard"`
 	Name       string    `json:"name"`
 	IP         string    `json:"ip"`
 	UserAgent  string    `json:"userAgent"`
