@@ -2,8 +2,8 @@
 
 # 构建应用
 build:
-	go build -o bin/blackappClient ./cmd/client
-	go build -o bin/blackappServer ./cmd/server
+	go build -o bin/blackClient ./cmd/client
+	go build -o bin/blackServer ./cmd/server
 
 # 运行应用
 run:
@@ -24,13 +24,12 @@ clean:
 
 # 构建 Docker 镜像
 docker-build:
-	docker build -t blackappClient .
-	docker build -t blackappServer .
+	docker build -t blackClient .
+	docker build -t blackServer .
 
 # 运行 Docker 容器
 docker-run:
-	docker run -p 8080:8080 blackappServer
-	docker run -p 8081:8081 blackappClient
+	docker-compose up
 
 # 停止 Docker 容器
 docker-stop:
@@ -47,3 +46,43 @@ fmt:
 # 运行代码检查
 lint:
 	golangci-lint run 
+
+# systemctl 生成 blackServer.service
+systemd:
+	@echo "[Unit]" > blackServer.service
+	@echo "Description=Black Server Service" >> blackServer.service
+	@echo "After=network.target postgresql.service redis.service" >> blackServer.service
+	@echo "" >> blackServer.service
+	@echo "[Service]" >> blackServer.service
+	@echo "Type=simple" >> blackServer.service
+	@echo "User=www-data" >> blackServer.service
+	@echo "Group=www-data" >> blackServer.service
+	@echo "WorkingDirectory=/sites/blacklist/app" >> blackServer.service
+	@echo "ExecStart=/sites/blacklist/app/bin/blackServer" >> blackServer.service
+	@echo "Restart=always" >> blackServer.service
+	@echo "RestartSec=3" >> blackServer.service
+	@echo "" >> blackServer.service
+	@echo "[Install]" >> blackServer.service
+	@echo "WantedBy=multi-user.target" >> blackServer.service
+	@sudo mv blackServer.service /etc/systemd/system/
+	@sudo systemctl daemon-reload
+	@echo "Black Server service has been installed. Use 'sudo systemctl start blackServer' to start it." 
+
+	@echo "[Unit]" > blackClient.service
+	@echo "Description=Black Client Service" >> blackClient.service
+	@echo "After=network.target postgresql.service redis.service" >> blackClient.service
+	@echo "" >> blackClient.service
+	@echo "[Service]" >> blackClient.service
+	@echo "Type=simple" >> blackClient.service
+	@echo "User=www-data" >> blackClient.service
+	@echo "Group=www-data" >> blackClient.service
+	@echo "WorkingDirectory=/sites/blacklist/app" >> blackClient.service
+	@echo "ExecStart=/sites/blacklist/app/bin/blackClient" >> blackClient.service
+	@echo "Restart=always" >> blackClient.service
+	@echo "RestartSec=3" >> blackClient.service
+	@echo "" >> blackClient.service
+	@echo "[Install]" >> blackClient.service
+	@echo "WantedBy=multi-user.target" >> blackClient.service
+	@sudo mv blackClient.service /etc/systemd/system/
+	@sudo systemctl daemon-reload
+	@echo "Black Client service has been installed. Use 'sudo systemctl start blackClient' to start it." 

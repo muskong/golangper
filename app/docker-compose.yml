@@ -16,7 +16,7 @@ services:
   appClient:
     build: ./cmd/client
     ports:
-      - "8081:8081"
+      - "8081:8080"
     depends_on:
       - postgres
       - redis
@@ -26,10 +26,10 @@ services:
       - ./logs:/app/logs
 
   postgres:
-    image: postgres:13-alpine
+    image: postgres:17-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: blackuser  
+      POSTGRES_PASSWORD: ZaX0VFi3BNfApBUuBQucTk7rI08plgIt
       POSTGRES_DB: blackapp
     ports:
       - "5432:5432"
