@@ -16,7 +16,11 @@
    14. 数据库字段名保持下划线命名（snake_case）
    15. Go结构体字段名保持大驼峰命名（PascalCase）
    16. JSON标签使用小驼峰命名（camelCase）
-项目功能说明：
+使用go.work文件进行项目管理
+   1. marchants 商户管理模块
+   2. blacklist 黑名单管理模块
+   3. system 系统管理模块
+具体项目功能说明：
    1. 商户管理
       1. 后台管理功能
          1. 商户添加
