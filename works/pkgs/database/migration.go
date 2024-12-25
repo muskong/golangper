@@ -41,10 +41,13 @@ func InitAdminUser() error {
 	// 如果没有管理员账号，则创建默认管理员
 	if count == 0 {
 		admin := &admins.Admin{
-			Username: "admin",
-			Password: "21232f297a57a5a743894a0e4a801fc3", // admin的MD5值
-			Name:     "系统管理员",
-			Status:   1,
+			AdminName:     "admin",
+			AdminPassword: "21232f297a57a5a743894a0e4a801fc3", // admin的MD5值
+			AdminEmail:    "admin@example.com",
+			AdminPhone:    "1234567890",
+			AdminSex:      0,
+			AdminAvatar:   "",
+			AdminStatus:   1,
 		}
 		if err := DB.Create(admin).Error; err != nil {
 			logger.Logger.Error("创建默认管理员失败", zap.Error(err))

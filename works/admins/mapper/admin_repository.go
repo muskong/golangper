@@ -40,9 +40,9 @@ func (r *AdminRepository) FindByID(ctx *gin.Context, id int) (*entity.Admin, err
 	return &admin, nil
 }
 
-func (r *AdminRepository) FindByUsername(ctx *gin.Context, username string) (*entity.Admin, error) {
+func (r *AdminRepository) FindByAdminName(ctx *gin.Context, adminName string) (*entity.Admin, error) {
 	var admin entity.Admin
-	err := database.DB.Where("username = ?", username).First(&admin).Error
+	err := database.DB.Where("admin_name = ?", adminName).First(&admin).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

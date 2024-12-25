@@ -24,3 +24,15 @@ const (
 	UserTypeMerchant = 1 // 商户
 	UserTypeAdmin    = 2 // 管理员
 )
+
+const (
+	LoginTypePassword = "password"
+	LoginTypeOTP      = "otp"
+	LoginTypeSocial   = "social"
+)
+
+const (
+	LoginStatusSuccess = "success"
+	LoginStatusFailed  = "failed"
+	LoginStatusLocked  = "locked"
+)
