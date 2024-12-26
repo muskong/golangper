@@ -2,26 +2,28 @@ package mapper
 
 import (
 	"blacklists/domain/entity"
-	"pkgs/database"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-type QueryLogRepository struct{}
+type QueryLogRepository struct {
+	db *gorm.DB
+}
 
-func NewQueryLogRepository() *QueryLogRepository {
-	return &QueryLogRepository{}
+func NewQueryLogRepository(db *gorm.DB) *QueryLogRepository {
+	return &QueryLogRepository{db: db}
 }
 
 func (r *QueryLogRepository) Create(ctx *gin.Context, log *entity.QueryLog) error {
-	return database.DB.Create(log).Error
+	return r.db.Create(log).Error
 }
 
 func (r *QueryLogRepository) List(ctx *gin.Context, merchantID int, page, size int) ([]*entity.QueryLog, int64, error) {
 	var logs []*entity.QueryLog
 	var total int64
 
-	query := database.DB.Model(&entity.QueryLog{})
+	query := r.db.Model(&entity.QueryLog{})
 	if merchantID > 0 {
 		query = query.Where("merchant_id = ?", merchantID)
 	}

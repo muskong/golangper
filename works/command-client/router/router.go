@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"pkgs/config"
+	"pkgs/database"
 
 	blacklistMapper "blacklists/mapper"
 	merchantMapper "merchants/mapper"
@@ -36,10 +37,10 @@ func InitClientRouter() *gin.Engine {
 	}
 
 	// 初始化依赖
-	merchantRepo := merchantMapper.NewMerchantRepository()
-	loginLogRepo := merchantMapper.NewLoginLogRepository()
-	blacklistRepo := blacklistMapper.NewBlacklistRepository()
-	queryLogRepo := blacklistMapper.NewQueryLogRepository()
+	merchantRepo := merchantMapper.NewMerchantRepository(database.DB)
+	loginLogRepo := merchantMapper.NewLoginLogRepository(database.DB)
+	blacklistRepo := blacklistMapper.NewBlacklistRepository(database.DB)
+	queryLogRepo := blacklistMapper.NewQueryLogRepository(database.DB)
 
 	merchantService := merchantService.NewMerchantService(merchantRepo, loginLogRepo, jwtSecret, tokenExpire)
 	blacklistService := blacklistService.NewBlacklistService(blacklistRepo, queryLogRepo)

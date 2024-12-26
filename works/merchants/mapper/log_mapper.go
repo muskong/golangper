@@ -2,26 +2,28 @@ package mapper
 
 import (
 	"merchants/domain/entity"
-	"pkgs/database"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-type LoginLogRepository struct{}
+type LoginLogRepository struct {
+	db *gorm.DB
+}
 
-func NewLoginLogRepository() *LoginLogRepository {
-	return &LoginLogRepository{}
+func NewLoginLogRepository(db *gorm.DB) *LoginLogRepository {
+	return &LoginLogRepository{db: db}
 }
 
 func (r *LoginLogRepository) Create(ctx *gin.Context, log *entity.LoginLog) error {
-	return database.DB.Create(log).Error
+	return r.db.Create(log).Error
 }
 
 func (r *LoginLogRepository) List(ctx *gin.Context, userType int, page, size int) ([]*entity.LoginLog, int64, error) {
 	var logs []*entity.LoginLog
 	var total int64
 
-	query := database.DB.Model(&entity.LoginLog{})
+	query := r.db.Model(&entity.LoginLog{})
 	if userType > 0 {
 		query = query.Where("type = ?", userType)
 	}

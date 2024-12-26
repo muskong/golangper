@@ -14,6 +14,16 @@ func AutoMigrate() error {
 	// 需要迁移的实体列表
 	entities := []interface{}{
 		&admins.Admin{},
+		&admins.AdminRole{},
+		&admins.AdminPost{},
+		&admins.Department{},
+		&admins.Role{},
+		&admins.Post{},
+		&admins.Menu{},
+		&admins.RoleMenu{},
+		&admins.Config{},
+		&admins.Job{},
+		&admins.JobLog{},
 		&merchants.Merchant{},
 		&blacklists.Blacklist{},
 		&merchants.LoginLog{},
