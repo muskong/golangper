@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  blacklist-server:
+  blacklistserver:
     build: ./works/command-server/
     ports:
       - "8080:8080"
@@ -13,7 +13,7 @@ services:
     volumes:
       - ./logs:/app/logs
 
-  blacklist-client:
+  blacklistclient:
     build: ./works/command-client/
     ports:
       - "8081:8081"
