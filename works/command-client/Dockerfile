@@ -1,13 +1,13 @@
 FROM golang:alpine AS builder
 
 WORKDIR /app
-COPY . .
+COPY .. .
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./command-client/main.go
 
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/main .
-COPY --from=builder /app/configs ./configs
+COPY --from=builder /app/command-client/configs ./configs
 EXPOSE 8080
 CMD ["./main"] 
