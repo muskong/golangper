@@ -2,7 +2,6 @@ package mapper
 
 import (
 	"admins/domain/entity"
-	"admins/domain/repository"
 
 	"github.com/gin-gonic/gin"
 
@@ -13,7 +12,7 @@ type adminRepository struct {
 	db *gorm.DB
 }
 
-func NewAdminRepository(db *gorm.DB) repository.AdminRepository {
+func NewAdminRepository(db *gorm.DB) *adminRepository {
 	return &adminRepository{db: db}
 }
 

@@ -2,7 +2,6 @@ package mapper
 
 import (
 	"admins/domain/entity"
-	"admins/domain/repository"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,7 +11,7 @@ type configRepository struct {
 	db *gorm.DB
 }
 
-func NewConfigRepository(db *gorm.DB) repository.ConfigRepository {
+func NewConfigRepository(db *gorm.DB) *configRepository {
 	return &configRepository{db: db}
 }
 

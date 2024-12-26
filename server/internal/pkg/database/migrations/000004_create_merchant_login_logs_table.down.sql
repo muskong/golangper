@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS merchant_login_logs;

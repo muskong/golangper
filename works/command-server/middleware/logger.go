@@ -43,16 +43,16 @@ func Logger() gin.HandlerFunc {
 		latencyTime := endTime.Sub(startTime)
 
 		// 获取当前用户
-		var userID int
+		var adminID int
 		if claims, exists := c.Get("claims"); exists {
 			if jwtClaims, ok := claims.(*AdminClaims); ok {
-				userID = jwtClaims.AdminID
+				adminID = jwtClaims.AdminID
 			}
 		}
 
 		// 记录操作日志
 		operationLog := &dto.OperationLogCreateDTO{
-			UserID:            userID,
+			AdminID:           adminID,
 			OperationIP:       c.ClientIP(),
 			OperationMethod:   c.Request.Method,
 			OperationPath:     c.Request.URL.Path,

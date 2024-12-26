@@ -10,27 +10,27 @@ import (
 	"blacklists/domain/entity"
 )
 
-type BlacklistRepository struct {
+type blacklistRepository struct {
 	db *gorm.DB
 }
 
-func NewBlacklistRepository(db *gorm.DB) *BlacklistRepository {
-	return &BlacklistRepository{db: db}
+func NewBlacklistRepository(db *gorm.DB) *blacklistRepository {
+	return &blacklistRepository{db: db}
 }
 
-func (r *BlacklistRepository) Create(ctx *gin.Context, blacklist *entity.Blacklist) error {
+func (r *blacklistRepository) Create(ctx *gin.Context, blacklist *entity.Blacklist) error {
 	return r.db.Create(blacklist).Error
 }
 
-func (r *BlacklistRepository) Update(ctx *gin.Context, blacklist *entity.Blacklist) error {
+func (r *blacklistRepository) Update(ctx *gin.Context, blacklist *entity.Blacklist) error {
 	return r.db.Save(blacklist).Error
 }
 
-func (r *BlacklistRepository) Delete(ctx *gin.Context, id int) error {
+func (r *blacklistRepository) Delete(ctx *gin.Context, id int) error {
 	return r.db.Delete(&entity.Blacklist{}, id).Error
 }
 
-func (r *BlacklistRepository) FindByID(ctx *gin.Context, id int) (*entity.Blacklist, error) {
+func (r *blacklistRepository) FindByID(ctx *gin.Context, id int) (*entity.Blacklist, error) {
 	var blacklist entity.Blacklist
 	err := r.db.First(&blacklist, id).Error
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *BlacklistRepository) FindByID(ctx *gin.Context, id int) (*entity.Blackl
 	return &blacklist, nil
 }
 
-func (r *BlacklistRepository) List(ctx *gin.Context, page, size int) ([]*entity.Blacklist, int64, error) {
+func (r *blacklistRepository) List(ctx *gin.Context, page, size int) ([]*entity.Blacklist, int64, error) {
 	var blacklists []*entity.Blacklist
 	var total int64
 
@@ -57,11 +57,11 @@ func (r *BlacklistRepository) List(ctx *gin.Context, page, size int) ([]*entity.
 	return blacklists, total, err
 }
 
-func (r *BlacklistRepository) UpdateStatus(ctx *gin.Context, id int, status int) error {
+func (r *blacklistRepository) UpdateStatus(ctx *gin.Context, id int, status int) error {
 	return r.db.Model(&entity.Blacklist{}).Where("id = ?", id).Update("status", status).Error
 }
 
-func (r *BlacklistRepository) CheckByPhone(ctx *gin.Context, phone string) (*entity.Blacklist, error) {
+func (r *blacklistRepository) CheckByPhone(ctx *gin.Context, phone string) (*entity.Blacklist, error) {
 	var blacklist entity.Blacklist
 	err := r.db.Where("phone = ? AND status = ?", phone, constants.BlacklistStatusApproved).First(&blacklist).Error
 	if err != nil {
@@ -70,7 +70,7 @@ func (r *BlacklistRepository) CheckByPhone(ctx *gin.Context, phone string) (*ent
 	return &blacklist, nil
 }
 
-func (r *BlacklistRepository) CheckByIDCard(ctx *gin.Context, idCard string) (*entity.Blacklist, error) {
+func (r *blacklistRepository) CheckByIDCard(ctx *gin.Context, idCard string) (*entity.Blacklist, error) {
 	var blacklist entity.Blacklist
 	err := r.db.Where("id_card = ? AND status = ?", idCard, constants.BlacklistStatusApproved).First(&blacklist).Error
 	if err != nil {
@@ -79,7 +79,7 @@ func (r *BlacklistRepository) CheckByIDCard(ctx *gin.Context, idCard string) (*e
 	return &blacklist, nil
 }
 
-func (r *BlacklistRepository) CheckByName(ctx *gin.Context, name string) (*entity.Blacklist, error) {
+func (r *blacklistRepository) CheckByName(ctx *gin.Context, name string) (*entity.Blacklist, error) {
 	var blacklist entity.Blacklist
 	err := r.db.Where("name = ? AND status = ?", name, constants.BlacklistStatusApproved).First(&blacklist).Error
 	if err != nil {

@@ -42,13 +42,11 @@ func InitServerRouter() *gin.Engine {
 	}
 
 	// 初始化系统服务依赖
-	adminRepo := adminMapper.NewAdminRepository(database.DB)
-	merchantRepo := merchantMapper.NewMerchantRepository(database.DB)
-	loginLogRepo := merchantMapper.NewLoginLogRepository(database.DB)
-	queryLogRepo := blacklistMapper.NewQueryLogRepository(database.DB)
-	blacklistRepo := blacklistMapper.NewBlacklistRepository(database.DB)
+	adminRepo, logRepo, _ := adminMapper.NewRepository(database.DB)
+	merchantRepo, loginLogRepo := merchantMapper.NewRepository(database.DB)
+	queryLogRepo, blacklistRepo := blacklistMapper.NewRepository(database.DB)
 
-	adminService := adminService.NewAdminService(adminRepo, jwtSecret, tokenExpire)
+	adminService := adminService.NewAdminService(adminRepo, logRepo, jwtSecret, tokenExpire)
 	merchantService := merchantService.NewMerchantService(merchantRepo, loginLogRepo, jwtSecret, tokenExpire)
 	blacklistService := blacklistService.NewBlacklistService(blacklistRepo, queryLogRepo)
 	systemService := systemService.NewSystemService(database.RDB, database.DB)

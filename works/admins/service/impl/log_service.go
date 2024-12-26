@@ -19,8 +19,8 @@ func NewLogService(logRepo repository.LogRepository) *logService {
 
 func (s *logService) CreateOperationLog(ctx *gin.Context, req *dto.OperationLogCreateDTO) error {
 	log := &entity.OperationLog{
-		UserID:            req.UserID,
-		UserName:          req.UserName,
+		AdminID:           req.AdminID,
+		AdminName:         req.AdminName,
 		OperationIP:       req.OperationIP,
 		OperationLocation: req.OperationLocation,
 		OperationBrowser:  req.OperationBrowser,
@@ -49,8 +49,8 @@ func (s *logService) ListOperationLogs(ctx *gin.Context, page, pageSize int) ([]
 	for i, log := range logs {
 		items[i] = &dto.OperationLogInfo{
 			LogID:             log.LogID,
-			UserID:            log.UserID,
-			UserName:          log.UserName,
+			AdminID:           log.AdminID,
+			AdminName:         log.AdminName,
 			OperationIP:       log.OperationIP,
 			OperationLocation: log.OperationLocation,
 			OperationBrowser:  log.OperationBrowser,

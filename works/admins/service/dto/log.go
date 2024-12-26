@@ -1,7 +1,7 @@
 package dto
 
 type LogQueryDTO struct {
-	UserName    string `form:"userName"`
+	AdminName   string `form:"adminName"`
 	OperationIP string `form:"operationIp"`
 	Status      *int   `form:"status"`
 	StartTime   string `form:"startTime"`
@@ -9,8 +9,8 @@ type LogQueryDTO struct {
 }
 
 type OperationLogCreateDTO struct {
-	UserID            int    `json:"userId"`
-	UserName          string `json:"userName"`
+	AdminID           int    `json:"adminId"`
+	AdminName         string `json:"adminName"`
 	OperationIP       string `json:"operationIp"`
 	OperationLocation string `json:"operationLocation"`
 	OperationBrowser  string `json:"operationBrowser"`
@@ -27,8 +27,8 @@ type OperationLogCreateDTO struct {
 
 type OperationLogInfo struct {
 	LogID             int    `json:"logId"`
-	UserID            int    `json:"userId"`
-	UserName          string `json:"userName"`
+	AdminID           int    `json:"adminId"`
+	AdminName         string `json:"adminName"`
 	OperationIP       string `json:"operationIp"`
 	OperationLocation string `json:"operationLocation"`
 	OperationBrowser  string `json:"operationBrowser"`
@@ -42,28 +42,4 @@ type OperationLogInfo struct {
 	OperationRequest  string `json:"operationRequest"`
 	OperationResponse string `json:"operationResponse"`
 	CreatedAt         string `json:"createdAt"`
-}
-
-type LoginLogCreateDTO struct {
-	UserID        int    `json:"userId"`
-	UserName      string `json:"userName"`
-	LoginIP       string `json:"loginIp"`
-	LoginLocation string `json:"loginLocation"`
-	LoginBrowser  string `json:"loginBrowser"`
-	LoginOS       string `json:"loginOs"`
-	LoginStatus   int8   `json:"loginStatus"`
-	LoginMessage  string `json:"loginMessage"`
-}
-
-type LoginLogInfo struct {
-	LogID         int    `json:"logId"`
-	UserID        int    `json:"userId"`
-	UserName      string `json:"userName"`
-	LoginIP       string `json:"loginIp"`
-	LoginLocation string `json:"loginLocation"`
-	LoginBrowser  string `json:"loginBrowser"`
-	LoginOS       string `json:"loginOs"`
-	LoginStatus   int8   `json:"loginStatus"`
-	LoginMessage  string `json:"loginMessage"`
-	CreatedAt     string `json:"createdAt"`
 }

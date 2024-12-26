@@ -7,19 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type QueryLogRepository struct {
+type queryLogRepository struct {
 	db *gorm.DB
 }
 
-func NewQueryLogRepository(db *gorm.DB) *QueryLogRepository {
-	return &QueryLogRepository{db: db}
+func NewQueryLogRepository(db *gorm.DB) *queryLogRepository {
+	return &queryLogRepository{db: db}
 }
 
-func (r *QueryLogRepository) Create(ctx *gin.Context, log *entity.QueryLog) error {
+func (r *queryLogRepository) Create(ctx *gin.Context, log *entity.QueryLog) error {
 	return r.db.Create(log).Error
 }
 
-func (r *QueryLogRepository) List(ctx *gin.Context, merchantID int, page, size int) ([]*entity.QueryLog, int64, error) {
+func (r *queryLogRepository) List(ctx *gin.Context, merchantID int, page, size int) ([]*entity.QueryLog, int64, error) {
 	var logs []*entity.QueryLog
 	var total int64
 

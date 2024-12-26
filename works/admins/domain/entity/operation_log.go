@@ -5,8 +5,8 @@ import "time"
 // OperationLog represents a system operation log
 type OperationLog struct {
 	LogID             int       `gorm:"column:log_id;primaryKey;autoIncrement"`
-	UserID            int       `gorm:"column:user_id;not null"`
-	UserName          string    `gorm:"column:user_name;size:50"`
+	AdminID           int       `gorm:"column:admin_id;not null"`
+	AdminName         string    `gorm:"column:admin_name;size:50"`
 	OperationIP       string    `gorm:"column:operation_ip;size:50"`
 	OperationLocation string    `gorm:"column:operation_location;size:100"`
 	OperationBrowser  string    `gorm:"column:operation_browser;size:50"`

@@ -7,19 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type LoginLogRepository struct {
+type loginLogRepository struct {
 	db *gorm.DB
 }
 
-func NewLoginLogRepository(db *gorm.DB) *LoginLogRepository {
-	return &LoginLogRepository{db: db}
+func NewLoginLogRepository(db *gorm.DB) *loginLogRepository {
+	return &loginLogRepository{db: db}
 }
 
-func (r *LoginLogRepository) Create(ctx *gin.Context, log *entity.LoginLog) error {
+func (r *loginLogRepository) Create(ctx *gin.Context, log *entity.LoginLog) error {
 	return r.db.Create(log).Error
 }
 
-func (r *LoginLogRepository) List(ctx *gin.Context, userType int, page, size int) ([]*entity.LoginLog, int64, error) {
+func (r *loginLogRepository) List(ctx *gin.Context, userType int, page, size int) ([]*entity.LoginLog, int64, error) {
 	var logs []*entity.LoginLog
 	var total int64
 

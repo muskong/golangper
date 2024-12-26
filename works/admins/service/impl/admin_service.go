@@ -16,17 +16,20 @@ import (
 
 type adminService struct {
 	adminRepo   repository.AdminRepository
+	logRepo     repository.LogRepository
 	jwtSecret   string
 	tokenExpire time.Duration
 }
 
 func NewAdminService(
 	adminRepo repository.AdminRepository,
+	logRepo repository.LogRepository,
 	jwtSecret string,
 	tokenExpire time.Duration,
 ) *adminService {
 	return &adminService{
 		adminRepo:   adminRepo,
+		logRepo:     logRepo,
 		jwtSecret:   jwtSecret,
 		tokenExpire: tokenExpire,
 	}
@@ -55,6 +58,23 @@ func (s *adminService) AdminLogin(ctx *gin.Context, req *dto.AdminLoginDTO) (str
 	admin.LastLogin = time.Now()
 	if err := s.adminRepo.Update(ctx, admin); err != nil {
 		logger.Logger.Error("更新管理员最后登录时间失败", zap.Error(err))
+	}
+
+	// 记录登录日志
+	if err := s.logRepo.CreateOperationLog(ctx, &entity.OperationLog{
+		AdminID:           admin.AdminID,
+		OperationIP:       ctx.ClientIP(),
+		OperationLocation: "管理员登录成功",
+		OperationBrowser:  ctx.Request.UserAgent(),
+		OperationOS:       ctx.Request.UserAgent(),
+		OperationMethod:   ctx.Request.Method,
+		OperationPath:     ctx.Request.URL.Path,
+		OperationModule:   "管理员登录",
+		OperationContent:  "管理员登录成功",
+		OperationStatus:   constants.LogStatusSuccess,
+		CreatedAt:         time.Now(),
+	}); err != nil {
+		logger.Logger.Error("记录登录日志失败", zap.Error(err))
 	}
 
 	return token, nil
@@ -139,7 +159,26 @@ func (s *adminService) UpdateAdmin(ctx *gin.Context, req *dto.UpdateAdminDTO) er
 }
 
 func (s *adminService) DeleteAdmin(ctx *gin.Context, adminID int) error {
-	return s.adminRepo.Delete(ctx, adminID)
+	// 删除管理员
+	if err := s.adminRepo.Delete(ctx, adminID); err != nil {
+		return err
+	}
+
+	s.logRepo.CreateOperationLog(ctx, &entity.OperationLog{
+		AdminID:           adminID,
+		OperationIP:       ctx.ClientIP(),
+		OperationLocation: "管理员删除成功",
+		OperationBrowser:  ctx.Request.UserAgent(),
+		OperationOS:       ctx.Request.UserAgent(),
+		OperationMethod:   ctx.Request.Method,
+		OperationPath:     ctx.Request.URL.Path,
+		OperationModule:   "管理员删除",
+		OperationContent:  "管理员删除成功",
+		OperationStatus:   constants.LogStatusSuccess,
+		CreatedAt:         time.Now(),
+	})
+
+	return nil
 }
 
 func (s *adminService) GetAdminInfo(ctx *gin.Context, adminID int) (*dto.AdminDTO, error) {
