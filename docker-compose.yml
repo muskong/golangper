@@ -26,7 +26,7 @@ services:
       - ./logs:/app/logs
 
   postgres:
-    image: postgres:17-alpine
+    image: postgres:alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -37,7 +37,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:6-alpine
+    image: redis:alpine
     ports:
       - "6379:6379"
     volumes:
