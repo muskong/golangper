@@ -7,6 +7,8 @@ ENV GOPROXY=https://goproxy.cn,direct
 
 COPY . .
 RUN cd works/command-server && \
+    export GO111MODULE=on && \
+    export GOPROXY=https://goproxy.io && \
     go mod tidy && \
     cd /app && \
     CGO_ENABLED=0 GOOS=linux go build -o main works/command-server/main.go
