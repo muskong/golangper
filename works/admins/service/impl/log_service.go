@@ -1,11 +1,12 @@
 package impl
 
 import (
-	"admins/api/dto"
 	"admins/domain/entity"
 	"admins/domain/repository"
-	"context"
+	"admins/service/dto"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type logService struct {
@@ -16,7 +17,7 @@ func NewLogService(logRepo repository.LogRepository) *logService {
 	return &logService{logRepo: logRepo}
 }
 
-func (s *logService) CreateOperationLog(ctx context.Context, req *dto.OperationLogCreateRequest) error {
+func (s *logService) CreateOperationLog(ctx *gin.Context, req *dto.OperationLogCreateDTO) error {
 	log := &entity.OperationLog{
 		UserID:            req.UserID,
 		UserName:          req.UserName,
@@ -38,15 +39,15 @@ func (s *logService) CreateOperationLog(ctx context.Context, req *dto.OperationL
 	return s.logRepo.CreateOperationLog(ctx, log)
 }
 
-func (s *logService) ListOperationLogs(ctx context.Context, query dto.LogQueryRequest) (*dto.PageResponse, error) {
-	logs, total, err := s.logRepo.ListOperationLogs(ctx, query)
+func (s *logService) ListOperationLogs(ctx *gin.Context, page, pageSize int) ([]*dto.OperationLogInfo, int64, error) {
+	logs, total, err := s.logRepo.ListOperationLogs(ctx, page, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	items := make([]dto.OperationLogInfo, len(logs))
+	items := make([]*dto.OperationLogInfo, len(logs))
 	for i, log := range logs {
-		items[i] = dto.OperationLogInfo{
+		items[i] = &dto.OperationLogInfo{
 			LogID:             log.LogID,
 			UserID:            log.UserID,
 			UserName:          log.UserName,
@@ -66,12 +67,7 @@ func (s *logService) ListOperationLogs(ctx context.Context, query dto.LogQueryRe
 		}
 	}
 
-	return &dto.PageResponse{
-		Total:    total,
-		List:     items,
-		PageNum:  query.PageNum,
-		PageSize: query.PageSize,
-	}, nil
+	return items, total, nil
 }
 
 // ... 继续实现其他方法

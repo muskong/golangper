@@ -1,16 +1,17 @@
 package service
 
 import (
-	"admins/api/dto"
-	"context"
+	"admins/service/dto"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ConfigService interface {
-	Create(ctx context.Context, req dto.ConfigCreateRequest) error
-	Update(ctx context.Context, req dto.ConfigUpdateRequest) error
-	Delete(ctx context.Context, configID int) error
-	GetByID(ctx context.Context, configID int) (*dto.ConfigInfo, error)
-	GetByKey(ctx context.Context, configKey string) (*dto.ConfigInfo, error)
-	List(ctx context.Context, query dto.PageQuery) (*dto.PageResponse, error)
-	RefreshCache(ctx context.Context) error
+	Create(ctx *gin.Context, req dto.ConfigCreateDTO) error
+	Update(ctx *gin.Context, req dto.ConfigUpdateDTO) error
+	Delete(ctx *gin.Context, configID int) error
+	GetByID(ctx *gin.Context, configID int) (*dto.ConfigInfo, error)
+	GetByKey(ctx *gin.Context, configKey string) (*dto.ConfigInfo, error)
+	List(ctx *gin.Context, page, pageSize int) ([]*dto.ConfigInfo, int64, error)
+	RefreshCache(ctx *gin.Context) error
 }

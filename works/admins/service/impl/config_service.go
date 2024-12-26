@@ -1,11 +1,12 @@
 package impl
 
 import (
-	"admins/api/dto"
 	"admins/domain/entity"
 	"admins/domain/repository"
-	"context"
+	"admins/service/dto"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type configService struct {
@@ -16,7 +17,7 @@ func NewConfigService(configRepo repository.ConfigRepository) *configService {
 	return &configService{configRepo: configRepo}
 }
 
-func (s *configService) Create(ctx context.Context, req dto.ConfigCreateRequest) error {
+func (s *configService) Create(ctx *gin.Context, req dto.ConfigCreateDTO) error {
 	config := &entity.Config{
 		ConfigName:        req.ConfigName,
 		ConfigKey:         req.ConfigKey,
@@ -30,7 +31,7 @@ func (s *configService) Create(ctx context.Context, req dto.ConfigCreateRequest)
 	return s.configRepo.Create(ctx, config)
 }
 
-func (s *configService) Update(ctx context.Context, req dto.ConfigUpdateRequest) error {
+func (s *configService) Update(ctx *gin.Context, req dto.ConfigUpdateDTO) error {
 	config, err := s.configRepo.FindByID(ctx, req.ConfigID)
 	if err != nil {
 		return err
@@ -46,11 +47,11 @@ func (s *configService) Update(ctx context.Context, req dto.ConfigUpdateRequest)
 	return s.configRepo.Update(ctx, config)
 }
 
-func (s *configService) Delete(ctx context.Context, configID int) error {
+func (s *configService) Delete(ctx *gin.Context, configID int) error {
 	return s.configRepo.Delete(ctx, configID)
 }
 
-func (s *configService) GetByID(ctx context.Context, configID int) (*dto.ConfigInfo, error) {
+func (s *configService) GetByID(ctx *gin.Context, configID int) (*dto.ConfigInfo, error) {
 	config, err := s.configRepo.FindByID(ctx, configID)
 	if err != nil {
 		return nil, err
@@ -68,7 +69,7 @@ func (s *configService) GetByID(ctx context.Context, configID int) (*dto.ConfigI
 	}, nil
 }
 
-func (s *configService) GetByKey(ctx context.Context, configKey string) (*dto.ConfigInfo, error) {
+func (s *configService) GetByKey(ctx *gin.Context, configKey string) (*dto.ConfigInfo, error) {
 	config, err := s.configRepo.FindByKey(ctx, configKey)
 	if err != nil {
 		return nil, err
@@ -86,15 +87,15 @@ func (s *configService) GetByKey(ctx context.Context, configKey string) (*dto.Co
 	}, nil
 }
 
-func (s *configService) List(ctx context.Context, query dto.PageQuery) (*dto.PageResponse, error) {
-	configs, total, err := s.configRepo.List(ctx, (query.PageNum-1)*query.PageSize, query.PageSize)
+func (s *configService) List(ctx *gin.Context, page, pageSize int) ([]*dto.ConfigInfo, int64, error) {
+	configs, total, err := s.configRepo.List(ctx, (page-1)*pageSize, pageSize)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	items := make([]dto.ConfigInfo, len(configs))
+	items := make([]*dto.ConfigInfo, len(configs))
 	for i, config := range configs {
-		items[i] = dto.ConfigInfo{
+		items[i] = &dto.ConfigInfo{
 			ConfigID:          config.ConfigID,
 			ConfigName:        config.ConfigName,
 			ConfigKey:         config.ConfigKey,
@@ -106,15 +107,10 @@ func (s *configService) List(ctx context.Context, query dto.PageQuery) (*dto.Pag
 		}
 	}
 
-	return &dto.PageResponse{
-		Total:    total,
-		List:     items,
-		PageNum:  query.PageNum,
-		PageSize: query.PageSize,
-	}, nil
+	return items, total, nil
 }
 
-func (s *configService) RefreshCache(ctx context.Context) error {
+func (s *configService) RefreshCache(ctx *gin.Context) error {
 	// TODO: 实现配置缓存刷新逻辑
 	return nil
 }
