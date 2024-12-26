@@ -28,21 +28,21 @@ func Error(c *gin.Context, code int, message string) {
 }
 
 func Unauthorized(c *gin.Context) {
-	c.JSON(http.StatusUnauthorized, Response{
+	c.AbortWithStatusJSON(http.StatusUnauthorized, Response{
 		Code:    401,
 		Message: "unauthorized",
 	})
 }
 
 func BadRequest(c *gin.Context, message string) {
-	c.JSON(http.StatusBadRequest, Response{
+	c.AbortWithStatusJSON(http.StatusBadRequest, Response{
 		Code:    400,
 		Message: message,
 	})
 }
 
 func ServerError(c *gin.Context) {
-	c.JSON(http.StatusInternalServerError, Response{
+	c.AbortWithStatusJSON(http.StatusInternalServerError, Response{
 		Code:    500,
 		Message: "internal server error",
 	})

@@ -13,6 +13,9 @@ type CreateAdminDTO struct {
 	AdminSex      int8   `json:"adminSex" binding:"required"`
 	AdminAvatar   string `json:"adminAvatar"`
 	AdminStatus   int    `json:"adminStatus" binding:"required"`
+	DepartmentID  *int   `json:"departmentId"`
+	RoleIDs       []int  `json:"roleIds" binding:"required"`
+	PostIDs       []int  `json:"postIds"`
 }
 
 type UpdateAdminDTO struct {
@@ -24,16 +27,21 @@ type UpdateAdminDTO struct {
 	AdminSex      int8   `json:"adminSex"`
 	AdminAvatar   string `json:"adminAvatar"`
 	AdminStatus   int    `json:"adminStatus"`
+	DepartmentID  *int   `json:"departmentId"`
+	RoleIDs       []int  `json:"roleIds" binding:"required"`
+	PostIDs       []int  `json:"postIds"`
 }
 
 type AdminDTO struct {
-	AdminID      int    `json:"adminID"`
-	DepartmentID *int   `json:"departmentID"`
-	AdminName    string `json:"adminName"`
-	AdminEmail   string `json:"adminEmail"`
-	AdminPhone   string `json:"adminPhone"`
-	AdminSex     int8   `json:"adminSex"`
-	AdminAvatar  string `json:"adminAvatar"`
-	AdminStatus  int    `json:"adminStatus"`
-	AdminLogin   string `json:"adminLogin"`
+	AdminID      int       `json:"adminID"`
+	DepartmentID *int      `json:"departmentID"`
+	AdminName    string    `json:"adminName"`
+	AdminEmail   string    `json:"adminEmail"`
+	AdminPhone   string    `json:"adminPhone"`
+	AdminSex     int8      `json:"adminSex"`
+	AdminAvatar  string    `json:"adminAvatar"`
+	AdminStatus  int       `json:"adminStatus"`
+	AdminLogin   string    `json:"adminLogin"`
+	Roles        []RoleDTO `json:"roles"`
+	Posts        []PostDTO `json:"posts"`
 }

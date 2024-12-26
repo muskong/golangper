@@ -105,10 +105,156 @@ func (h *AdminHandler) UpdateAdminStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.adminService.UpdateAdminStatus(c, int(id), status); err != nil {
+	err = h.adminService.UpdateAdmin(c, &dto.UpdateAdminDTO{
+		AdminID:     int(id),
+		AdminStatus: status,
+	})
+
+	if err != nil {
 		response.ServerError(c)
 		return
 	}
 
 	response.Success(c, nil)
+}
+
+// CreateRole 创建角色
+func (h *AdminHandler) CreateRole(c *gin.Context) {
+	var req dto.CreateRoleDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "无效的请求参数")
+		return
+	}
+
+	if err := h.adminService.CreateRole(c, &req); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// UpdateRole 更新角色
+func (h *AdminHandler) UpdateRole(c *gin.Context) {
+	var req dto.UpdateRoleDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "无效的请求参数")
+		return
+	}
+
+	if err := h.adminService.UpdateRole(c, &req); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// ListRoles 角色列表
+func (h *AdminHandler) ListRoles(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
+
+	roles, total, err := h.adminService.ListRoles(c, page, size)
+	if err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"list":  roles,
+		"total": total,
+	})
+}
+
+// DeleteRole 删除角色
+func (h *AdminHandler) DeleteRole(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "无效的ID")
+		return
+	}
+
+	if err := h.adminService.DeleteRole(c, int(id)); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// CreateDepartment 创建部门
+func (h *AdminHandler) CreateDepartment(c *gin.Context) {
+	var req dto.CreateDepartmentDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "无效的请求参数")
+		return
+	}
+
+	if err := h.adminService.CreateDepartment(c, &req); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// UpdateDepartment 更新部门
+func (h *AdminHandler) UpdateDepartment(c *gin.Context) {
+	var req dto.UpdateDepartmentDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "无效的请求参数")
+		return
+	}
+
+	if err := h.adminService.UpdateDepartment(c, &req); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// GetDepartmentTree 获取部门树
+func (h *AdminHandler) GetDepartmentTree(c *gin.Context) {
+	tree, err := h.adminService.GetDepartmentTree(c)
+	if err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, tree)
+}
+
+// DeleteDepartment 删除部门
+func (h *AdminHandler) DeleteDepartment(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		response.BadRequest(c, "无效的ID")
+		return
+	}
+
+	if err := h.adminService.DeleteDepartment(c, int(id)); err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, nil)
+}
+
+// GetAdminInfo 获取管理员信息
+func (h *AdminHandler) GetAdminInfo(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response.BadRequest(c, "无效的ID")
+		return
+	}
+
+	info, err := h.adminService.GetAdminInfo(c, id)
+	if err != nil {
+		response.ServerError(c)
+		return
+	}
+
+	response.Success(c, info)
 }

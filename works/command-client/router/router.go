@@ -1,13 +1,13 @@
 package router
 
 import (
+	"command-client/middleware"
 	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"pkgs/config"
-	"pkgs/middleware"
 
 	blacklistMapper "blacklists/mapper"
 	merchantMapper "merchants/mapper"
@@ -55,7 +55,7 @@ func InitClientRouter() *gin.Engine {
 
 	// 需要认证的接口
 	authorized := app.Group("/api/v1")
-	authorized.Use(middleware.JWTAuth())
+	authorized.Use(middleware.JWTAuthMerchant())
 	{
 		// 黑名单管理
 		blacklists := authorized.Group("/blacklists")

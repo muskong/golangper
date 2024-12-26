@@ -1,6 +1,7 @@
 package router
 
 import (
+	"command-server/middleware"
 	"log"
 	"time"
 
@@ -8,7 +9,6 @@ import (
 
 	"pkgs/config"
 	"pkgs/database"
-	"pkgs/middleware"
 
 	adminMapper "admins/mapper"
 	blacklistMapper "blacklists/mapper"
@@ -42,7 +42,7 @@ func InitServerRouter() *gin.Engine {
 	}
 
 	// 初始化系统服务依赖
-	adminRepo := adminMapper.NewAdminRepository()
+	adminRepo := adminMapper.NewAdminRepository(database.DB)
 	loginLogRepo := merchantMapper.NewLoginLogRepository()
 	queryLogRepo := blacklistMapper.NewQueryLogRepository()
 	merchantRepo := merchantMapper.NewMerchantRepository()
@@ -66,7 +66,7 @@ func InitServerRouter() *gin.Engine {
 
 	// 需要认证的接口
 	authorized := app.Group("/api/v1")
-	authorized.Use(middleware.JWTAuth())
+	authorized.Use(middleware.JWTAuthAdmin())
 	{
 		// 商户管理
 		merchants := authorized.Group("/merchants")
@@ -82,7 +82,6 @@ func InitServerRouter() *gin.Engine {
 
 		// 黑名单管理
 		blacklists := authorized.Group("/blacklists")
-		blacklists.Use(middleware.RateLimit())
 		{
 			blacklists.POST("", blacklistHandler.Create)
 			blacklists.PUT("/:id", blacklistHandler.Update)
@@ -103,6 +102,24 @@ func InitServerRouter() *gin.Engine {
 			admins.PUT("/:id", adminHandler.UpdateAdmin)
 			admins.GET("", adminHandler.ListAdmins)
 			admins.PUT("/:id/status", adminHandler.UpdateAdminStatus)
+		}
+
+		// 角色管理
+		role := authorized.Group("/role")
+		{
+			role.POST("", adminHandler.CreateRole)
+			role.PUT("", adminHandler.UpdateRole)
+			role.GET("/list", adminHandler.ListRoles)
+			role.DELETE("/:id", adminHandler.DeleteRole)
+		}
+
+		// 部门管理
+		dept := authorized.Group("/department")
+		{
+			dept.POST("", adminHandler.CreateDepartment)
+			dept.PUT("", adminHandler.UpdateDepartment)
+			dept.GET("/tree", adminHandler.GetDepartmentTree)
+			dept.DELETE("/:id", adminHandler.DeleteDepartment)
 		}
 	}
 

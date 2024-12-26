@@ -1,13 +1,21 @@
 package entity
 
+import "time"
+
 // Role represents a role in the system
 type Role struct {
-	RoleID          int    `gorm:"primaryKey;column:role_id;autoIncrement"`
-	RoleName        string `gorm:"column:role_name;size:100;not null;unique"`
-	RoleCode        string `gorm:"column:role_code;size:50;not null;unique"`
-	RoleDescription string `gorm:"column:role_description;type:text"`
-	RoleStatus      int8   `gorm:"column:role_status;default:1"`
-	BaseModel
+	RoleID          int       `gorm:"column:role_id;primaryKey;autoIncrement"`
+	RoleName        string    `gorm:"column:role_name;size:50;not null;uniqueIndex"`
+	RoleCode        string    `gorm:"column:role_code;size:50;not null;uniqueIndex"`
+	RoleDescription string    `gorm:"column:role_description;size:200"`
+	RoleStatus      int8      `gorm:"column:role_status;default:1"`
+	CreatedAt       time.Time `gorm:"column:created_at;not null"`
+	UpdatedAt       time.Time `gorm:"column:updated_at"`
+	DeletedAt       time.Time `gorm:"column:deleted_at;index"`
+
+	// 关联
+	Menus       []Menu       `gorm:"many2many:role_menus"`
+	Departments []Department `gorm:"many2many:role_departments"`
 }
 
 // TableName returns the table name for the Role model

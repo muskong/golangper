@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"command-client/middleware"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -11,7 +12,6 @@ import (
 	"merchants/domain/repository"
 	"merchants/service/dto"
 	"pkgs/logger"
-	"pkgs/middleware"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -139,7 +139,7 @@ func (s *merchantService) Login(ctx *gin.Context, req *dto.MerchantLoginDTO) (st
 		return "", fmt.Errorf("invalid credentials")
 	}
 
-	tokenString, err := middleware.GenerateToken(merchant.ID)
+	tokenString, err := middleware.MerchantGenerateToken(merchant.ID)
 	if err != nil {
 		logger.Logger.Error("生成商户token失败", zap.Int("merchantID", merchant.ID), zap.Error(err))
 		return "", err

@@ -12,7 +12,7 @@ import (
 	"pkgs/response"
 )
 
-func JWTAuth() gin.HandlerFunc {
+func JWTAuthMerchant() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -29,7 +29,7 @@ func JWTAuth() gin.HandlerFunc {
 		}
 
 		// 验证token
-		claims, err := parseToken(parts[1])
+		claims, err := MerchantParseToken(parts[1])
 		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
@@ -42,18 +42,21 @@ func JWTAuth() gin.HandlerFunc {
 	}
 }
 
-type Claims struct {
+type MerchantClaims struct {
 	MerchantID int `json:"merchantID"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(merchantID int) (string, error) {
-	claims := Claims{
+func MerchantGenerateToken(merchantID int) (string, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(24 * time.Hour)
+
+	claims := MerchantClaims{
 		MerchantID: merchantID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(expireTime),
+			IssuedAt:  jwt.NewNumericDate(nowTime),
+			NotBefore: jwt.NewNumericDate(nowTime),
 		},
 	}
 
@@ -61,8 +64,8 @@ func GenerateToken(merchantID int) (string, error) {
 	return token.SignedString([]byte(config.GetString("jwt.secret")))
 }
 
-func parseToken(tokenString string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+func MerchantParseToken(tokenString string) (*MerchantClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &MerchantClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.GetString("jwt.secret")), nil
 	})
 
@@ -70,7 +73,7 @@ func parseToken(tokenString string) (*Claims, error) {
 		return nil, err
 	}
 
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+	if claims, ok := token.Claims.(*MerchantClaims); ok && token.Valid {
 		return claims, nil
 	}
 
