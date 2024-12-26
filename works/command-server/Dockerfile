@@ -1,6 +1,10 @@
 FROM golang:alpine AS builder
 
 WORKDIR /app
+# 设置 Go 环境变量
+ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.cn,direct
+
 COPY . .
 RUN cd works/command-server && \
     go mod tidy && \
