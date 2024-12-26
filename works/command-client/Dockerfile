@@ -5,6 +5,12 @@ WORKDIR /app
 ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.cn,direct
 
+RUN go env
+RUN go env -w GO111MODULE=on
+RUN go env -w GOPROXY=https://goproxy.cn,direct
+RUN go env
+
+
 COPY . .
 RUN cd works/command-client && \
     go mod tidy && \
