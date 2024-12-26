@@ -1,28 +1,35 @@
-version: '3'
+version: '3.8'
 
 services:
-  blacklistserver:
-    build: ./works/command-server/
+  command-server:
+    build:
+      context: .
+      dockerfile: works/command-server/Dockerfile
     ports:
       - "8080:8080"
+    restart: unless-stopped
     depends_on:
       - postgres
       - redis
     environment:
       - GIN_MODE=release
     volumes:
+      - ./configs:/app/configs
       - ./logs:/app/logs
-
-  blacklistclient:
-    build: ./works/command-client/
+  command-client:
+    build:
+      context: .
+      dockerfile: works/command-client/Dockerfile
     ports:
       - "8081:8081"
+    restart: unless-stopped
     depends_on:
       - postgres
       - redis
     environment:
       - GIN_MODE=release
     volumes:
+      - ./configs:/app/configs
       - ./logs:/app/logs
 
   postgres:
@@ -42,6 +49,10 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+networks:
+  app-network:
+    driver: bridge 
 
 volumes:
   postgres_data:
