@@ -1,10 +1,22 @@
 version: '3'
 
 services:
-  app:
-    build: ./server/
+  blacklist-server:
+    build: ./works/command-server/
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - GIN_MODE=release
+    volumes:
+      - ./logs:/app/logs
+
+  blacklist-client:
+    build: ./works/command-client/
+    ports:
+      - "8081:8081"
     depends_on:
       - postgres
       - redis
