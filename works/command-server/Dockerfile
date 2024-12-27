@@ -9,7 +9,7 @@ COPY . .
 RUN cd works/command-server && \
     go mod tidy && \
     cd /app && \
-    CGO_ENABLED=0 GOOS=linux go build -o main works/command-server/main.go
+    go build -o main works/command-server/main.go
 
 FROM alpine:latest
 WORKDIR /app
