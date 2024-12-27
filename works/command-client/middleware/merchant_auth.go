@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
-	"pkgs/config"
-	"pkgs/response"
+	"github.com/muskong/gopermission/works/pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/response"
 )
 
 func JWTAuthMerchant() gin.HandlerFunc {

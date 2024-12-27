@@ -1,10 +1,13 @@
 package database
 
 import (
-	admins "admins/domain/entity"
-	blacklists "blacklists/domain/entity"
-	merchants "merchants/domain/entity"
-	"pkgs/logger"
+	blacklists "github.com/muskong/gopermission/works/blacklists/domain/entity"
+
+	merchants "github.com/muskong/gopermission/works/merchants/domain/entity"
+
+	"github.com/muskong/gopermission/works/pkgs/logger"
+
+	admins "github.com/muskong/gopermission/works/admins/domain/entity"
 
 	"go.uber.org/zap"
 )

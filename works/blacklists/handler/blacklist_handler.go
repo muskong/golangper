@@ -5,9 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"blacklists/service"
-	"blacklists/service/dto"
-	"pkgs/response"
+	"github.com/muskong/gopermission/works/blacklists/service"
+	"github.com/muskong/gopermission/works/blacklists/service/dto"
+
+	"github.com/muskong/gopermission/works/pkgs/response"
 )
 
 type BlacklistHandler struct {

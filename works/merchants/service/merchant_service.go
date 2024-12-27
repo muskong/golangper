@@ -1,7 +1,7 @@
 package service
 
 import (
-	"merchants/service/dto"
+	"github.com/muskong/gopermission/works/merchants/service/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,5 +18,4 @@ type MerchantService interface {
 
 	// 日志查询
 	ListLoginLogs(ctx *gin.Context, userType int, page, size int) ([]*dto.LoginLogDTO, int64, error)
-	
 }

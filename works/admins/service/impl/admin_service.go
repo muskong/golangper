@@ -1,13 +1,15 @@
 package impl
 
 import (
-	"admins/domain/constants"
-	"admins/domain/entity"
-	"admins/domain/repository"
-	"admins/service/dto"
 	"command-server/middleware"
-	"pkgs/logger"
 	"time"
+
+	"github.com/muskong/gopermission/works/pkgs/logger"
+
+	"github.com/muskong/gopermission/works/admins/domain/constants"
+	"github.com/muskong/gopermission/works/admins/domain/entity"
+	"github.com/muskong/gopermission/works/admins/domain/repository"
+	"github.com/muskong/gopermission/works/admins/service/dto"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

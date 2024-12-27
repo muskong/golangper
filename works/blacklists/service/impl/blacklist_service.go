@@ -1,11 +1,12 @@
 package impl
 
 import (
-	"blacklists/domain/constants"
-	"blacklists/domain/entity"
-	"blacklists/domain/repository"
-	"blacklists/service/dto"
-	"pkgs/logger"
+	"github.com/muskong/gopermission/works/blacklists/domain/constants"
+	"github.com/muskong/gopermission/works/blacklists/domain/entity"
+	"github.com/muskong/gopermission/works/blacklists/domain/repository"
+	"github.com/muskong/gopermission/works/blacklists/service/dto"
+
+	"github.com/muskong/gopermission/works/pkgs/logger"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

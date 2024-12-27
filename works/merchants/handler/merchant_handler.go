@@ -5,9 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"merchants/service"
-	"merchants/service/dto"
-	"pkgs/response"
+	"github.com/muskong/gopermission/works/merchants/service"
+	"github.com/muskong/gopermission/works/merchants/service/dto"
+
+	"github.com/muskong/gopermission/works/pkgs/response"
 )
 
 type MerchantHandler struct {

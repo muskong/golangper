@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"admins/service/dto"
 	"bytes"
 	"io"
 	"time"
+
+	"github.com/muskong/gopermission/works/admins/service/dto"
 
 	"github.com/gin-gonic/gin"
 )

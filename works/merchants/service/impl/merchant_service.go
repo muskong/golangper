@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"merchants/domain/constants"
-	"merchants/domain/entity"
-	"merchants/domain/repository"
-	"merchants/service/dto"
-	"pkgs/logger"
+	"github.com/muskong/gopermission/works/merchants/domain/constants"
+	"github.com/muskong/gopermission/works/merchants/domain/entity"
+	"github.com/muskong/gopermission/works/merchants/domain/repository"
+	"github.com/muskong/gopermission/works/merchants/service/dto"
+
+	"github.com/muskong/gopermission/works/pkgs/logger"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

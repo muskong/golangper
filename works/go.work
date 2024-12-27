@@ -1,11 +1,11 @@
 
 go 1.23.4
 use (
-    ./admins
-    ./blacklists
-    ./systems
-    ./merchants
-    ./command-client
-    ./command-server
-    ./pkgs
+    github.com/muskong/gopermission/works/admins
+    github.com/muskong/gopermission/works/blacklists
+    github.com/muskong/gopermission/works/systems
+    github.com/muskong/gopermission/works/merchants
+    github.com/muskong/gopermission/works/command-client
+    github.com/muskong/gopermission/works/command-server
+    github.com/muskong/gopermission/works/pkgs
 )

@@ -5,9 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"admins/service"
-	"admins/service/dto"
-	"pkgs/response"
+	"github.com/muskong/gopermission/works/pkgs/response"
+
+	"github.com/muskong/gopermission/works/admins/service"
+	"github.com/muskong/gopermission/works/admins/service/dto"
 )
 
 type AdminHandler struct {

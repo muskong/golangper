@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"merchants/domain/entity"
-	"merchants/service/dto"
+	"github.com/muskong/gopermission/works/merchants/domain/entity"
+	"github.com/muskong/gopermission/works/merchants/service/dto"
 )
 
 type MockMerchantRepository struct {

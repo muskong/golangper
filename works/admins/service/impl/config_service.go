@@ -1,10 +1,11 @@
 package impl
 
 import (
-	"admins/domain/entity"
-	"admins/domain/repository"
-	"admins/service/dto"
 	"time"
+
+	"github.com/muskong/gopermission/works/admins/domain/entity"
+	"github.com/muskong/gopermission/works/admins/domain/repository"
+	"github.com/muskong/gopermission/works/admins/service/dto"
 
 	"github.com/gin-gonic/gin"
 )

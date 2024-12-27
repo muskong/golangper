@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"admins/domain/entity"
+	"github.com/muskong/gopermission/works/admins/domain/entity"
 
 	"github.com/gin-gonic/gin"
 )

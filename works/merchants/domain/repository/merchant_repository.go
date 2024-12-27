@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"merchants/domain/entity"
 	"time"
+
+	"github.com/muskong/gopermission/works/merchants/domain/entity"
 
 	"github.com/gin-gonic/gin"
 )

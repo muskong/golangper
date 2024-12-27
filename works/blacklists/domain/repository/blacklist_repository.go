@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"blacklists/domain/entity"
+	"github.com/muskong/gopermission/works/blacklists/domain/entity"
 
 	"github.com/gin-gonic/gin"
 )

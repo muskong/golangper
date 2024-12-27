@@ -9,9 +9,9 @@ import (
 
 	"command-server/router"
 
-	"pkgs/config"
-	"pkgs/database"
-	"pkgs/logger"
+	"github.com/muskong/gopermission/works/pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/database"
+	"github.com/muskong/gopermission/works/pkgs/logger"
 )
 
 func main() {

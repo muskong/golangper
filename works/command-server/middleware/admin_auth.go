@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"pkgs/config"
-	"pkgs/response"
 	"strings"
 	"time"
+
+	"github.com/muskong/gopermission/works/pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/response"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

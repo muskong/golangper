@@ -1,7 +1,7 @@
 package database
 
 import (
-	"pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/config"
 
 	"github.com/go-redis/redis/v8"
 )

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 
-	"pkgs/response"
+	"github.com/muskong/gopermission/works/pkgs/response"
 )
 
 var limiter = rate.NewLimiter(rate.Every(time.Second), 100)

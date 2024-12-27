@@ -1,7 +1,7 @@
 package service
 
 import (
-	"admins/service/dto"
+	"github.com/muskong/gopermission/works/admins/service/dto"
 
 	"github.com/gin-gonic/gin"
 )

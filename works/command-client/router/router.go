@@ -7,17 +7,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"pkgs/config"
-	"pkgs/database"
+	"github.com/muskong/gopermission/works/pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/database"
 
-	blacklistMapper "blacklists/mapper"
-	merchantMapper "merchants/mapper"
+	blacklistMapper "github.com/muskong/gopermission/works/blacklists/mapper"
 
-	blacklistHandler "blacklists/handler"
-	merchantHandler "merchants/handler"
+	merchantMapper "github.com/muskong/gopermission/works/merchants/mapper"
 
-	blacklistService "blacklists/service/impl"
-	merchantService "merchants/service/impl"
+	blacklistHandler "github.com/muskong/gopermission/works/blacklists/handler"
+
+	merchantHandler "github.com/muskong/gopermission/works/merchants/handler"
+
+	blacklistService "github.com/muskong/gopermission/works/blacklists/service/impl"
+
+	merchantService "github.com/muskong/gopermission/works/merchants/service/impl"
 )
 
 func InitClientRouter() *gin.Engine {

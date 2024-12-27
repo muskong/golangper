@@ -7,22 +7,30 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"pkgs/config"
-	"pkgs/database"
+	"github.com/muskong/gopermission/works/pkgs/config"
+	"github.com/muskong/gopermission/works/pkgs/database"
 
-	adminMapper "admins/mapper"
-	blacklistMapper "blacklists/mapper"
-	merchantMapper "merchants/mapper"
+	blacklistMapper "github.com/muskong/gopermission/works/blacklists/mapper"
 
-	adminHandler "admins/handler"
-	blacklistHandler "blacklists/handler"
-	merchantHandler "merchants/handler"
-	systemHandler "systems/handler"
+	merchantMapper "github.com/muskong/gopermission/works/merchants/mapper"
 
-	adminService "admins/service/impl"
-	blacklistService "blacklists/service/impl"
-	merchantService "merchants/service/impl"
-	systemService "systems/service/impl"
+	adminMapper "github.com/muskong/gopermission/works/admins/mapper"
+
+	blacklistHandler "github.com/muskong/gopermission/works/blacklists/handler"
+
+	systemHandler "github.com/muskong/gopermission/works/systems/handler"
+
+	merchantHandler "github.com/muskong/gopermission/works/merchants/handler"
+
+	adminHandler "github.com/muskong/gopermission/works/admins/handler"
+
+	blacklistService "github.com/muskong/gopermission/works/blacklists/service/impl"
+
+	systemService "github.com/muskong/gopermission/works/systems/service/impl"
+
+	merchantService "github.com/muskong/gopermission/works/merchants/service/impl"
+
+	adminService "github.com/muskong/gopermission/works/admins/service/impl"
 )
 
 func InitServerRouter() *gin.Engine {

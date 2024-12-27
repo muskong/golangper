@@ -3,8 +3,9 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 
-	"pkgs/response"
-	"systems/service"
+	"github.com/muskong/gopermission/works/systems/service"
+
+	"github.com/muskong/gopermission/works/pkgs/response"
 )
 
 type SystemHandler struct {

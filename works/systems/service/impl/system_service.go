@@ -9,8 +9,9 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"pkgs/logger"
-	"systems/service/dto"
+	"github.com/muskong/gopermission/works/systems/service/dto"
+
+	"github.com/muskong/gopermission/works/pkgs/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"

@@ -1,7 +1,7 @@
 package mapper
 
 import (
-	"merchants/domain/entity"
+	"github.com/muskong/gopermission/works/merchants/domain/entity"
 
 	"time"
 

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"blacklists/domain/constants"
-	"blacklists/domain/entity"
+	"github.com/muskong/gopermission/works/blacklists/domain/constants"
+	"github.com/muskong/gopermission/works/blacklists/domain/entity"
 )
 
 type blacklistRepository struct {

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"blacklists/service/dto"
+	"github.com/muskong/gopermission/works/blacklists/service/dto"
 
 	"github.com/gin-gonic/gin"
 )

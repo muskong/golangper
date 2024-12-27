@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"blacklists/domain/entity"
-	"blacklists/service/dto"
+	"github.com/muskong/gopermission/works/blacklists/domain/entity"
+	"github.com/muskong/gopermission/works/blacklists/service/dto"
 )
 
 type MockBlacklistRepository struct {
